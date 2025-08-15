@@ -266,10 +266,9 @@ class MailDataUpdateCoordinator(DataUpdateCoordinator):
             image = self._data[ATTR_AMAZON_IMAGE]
             path = f"{default_image_path(self.hass, self.config)}/amazon/"
             amazon_image = f"{path}{image}"
+            amazon_none = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
             if self.config.get(CONF_AMAZON_CUSTOM_IMG):
                 amazon_none = self.config.get(CONF_AMAZON_CUSTOM_IMG_FILE)
-            else:
-                amazon_none = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
             amazon_check = os.path.exists(amazon_image)
             _LOGGER.debug("Amazon Check: %s", amazon_check)
             if amazon_check:
@@ -296,10 +295,9 @@ class MailDataUpdateCoordinator(DataUpdateCoordinator):
             path = f"{default_image_path(self.hass, self.config)}/ups/"
             ups_image = f"{path}{image}"
             _LOGGER.debug("Full UPS image path: %s", ups_image)
+            ups_none = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
             if self.config.get(CONF_UPS_CUSTOM_IMG):
                 ups_none = self.config.get(CONF_UPS_CUSTOM_IMG_FILE)
-            else:
-                ups_none = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
             ups_check = os.path.exists(ups_image)
             _LOGGER.debug("UPS Check: %s", ups_check)
             if ups_check:

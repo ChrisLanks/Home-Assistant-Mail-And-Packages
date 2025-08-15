@@ -1132,13 +1132,7 @@ def get_count(
     # Return Amazon delivered info
     if sensor_type == AMAZON_DELIVERED:
         result[ATTR_COUNT] = amazon_search(
-            account,
-            image_path,
-            hass,
-            amazon_image_name,
-            amazon_domain,
-            amazon_fwds,
-            data,
+            account, image_path, hass, amazon_image_name, amazon_domain, amazon_fwds, data
         )
         result[ATTR_TRACKING] = ""
         return result
@@ -1369,6 +1363,16 @@ def ups_search(
     _LOGGER.debug("UPS email search response: %s", server_response)
     _LOGGER.debug("UPS email search data: %s", data)
 
+    # Check if the path exists, if not make it (do this early for both cases)
+    ups_path = f"{image_path}ups/"
+    if not os.path.isdir(ups_path):
+        try:
+            os.makedirs(ups_path)
+            _LOGGER.debug("Created UPS directory: %s", ups_path)
+        except Exception as err:
+            _LOGGER.critical("Error creating directory: %s", str(err))
+            return count
+
     if server_response != "OK" or data[0] is None or data[0] == b"":
         _LOGGER.debug("No UPS delivery emails found")
         # Still need to create no-delivery image and update coordinator data
@@ -1380,8 +1384,12 @@ def ups_search(
             else:
                 no_delivery_filename = f"{str(uuid.uuid4())}.jpg"
             nomail = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
+            _LOGGER.debug("UPS no-delivery source file: %s", nomail)
+            _LOGGER.debug("UPS no-delivery source file exists: %s", os.path.exists(nomail))
+            _LOGGER.debug("UPS no-delivery destination: %s", f"{image_path}ups/" + no_delivery_filename)
             try:
                 copyfile(nomail, f"{image_path}ups/" + no_delivery_filename)
+                _LOGGER.debug("UPS no-delivery file copied successfully")
                 # Update coordinator data with the no-delivery filename
                 if coordinator_data is not None:
                     coordinator_data[ATTR_UPS_IMAGE] = no_delivery_filename
@@ -1392,15 +1400,6 @@ def ups_search(
             except Exception as err:
                 _LOGGER.error("Error attempting to copy image: %s", str(err))
         return count
-
-    # Check if the path exists, if not make it
-    ups_path = f"{image_path}ups/"
-    if not os.path.isdir(ups_path):
-        try:
-            os.makedirs(ups_path)
-        except Exception as err:
-            _LOGGER.critical("Error creating directory: %s", str(err))
-            return count
 
     # Clean up image directory
     cleanup_images(ups_path)
@@ -1444,7 +1443,6 @@ def amazon_search(
     amazon_image_name: str,
     amazon_domain: str,
     fwds: str = None,
-    coordinator_data: Optional[dict] = None,
 ) -> int:
     """Find Amazon Delivered email.
 
@@ -1481,13 +1479,6 @@ def amazon_search(
         nomail = f"{os.path.dirname(__file__)}/no_deliveries.jpg"
         try:
             copyfile(nomail, f"{image_path}amazon/" + amazon_image_name)
-            # Update coordinator data with the no-delivery filename
-            if coordinator_data is not None:
-                coordinator_data[ATTR_AMAZON_IMAGE] = amazon_image_name
-                _LOGGER.debug(
-                    "Updated coordinator data with no-delivery Amazon image: %s",
-                    amazon_image_name,
-                )
         except Exception as err:
             _LOGGER.error("Error attempting to copy image: %s", str(err))
 

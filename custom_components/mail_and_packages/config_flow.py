@@ -141,16 +141,16 @@ async def _validate_user_input(user_input: dict) -> tuple:
         errors[CONF_CUSTOM_IMG_FILE] = "file_not_found"
 
     # validate amazon custom file exists
-    if (
-        user_input.get(CONF_AMAZON_CUSTOM_IMG)
-        and CONF_AMAZON_CUSTOM_IMG_FILE in user_input
-    ):
-        valid = path.isfile(user_input[CONF_AMAZON_CUSTOM_IMG_FILE])
-    else:
-        valid = True
-
-    if not valid:
-        errors[CONF_AMAZON_CUSTOM_IMG_FILE] = "file_not_found"
+    #if (
+    #    user_input.get(CONF_AMAZON_CUSTOM_IMG)
+    #    and CONF_AMAZON_CUSTOM_IMG_FILE in user_input
+    #):
+    #    valid = path.isfile(user_input[CONF_AMAZON_CUSTOM_IMG_FILE])
+    #else:
+    #    valid = True
+#
+    #if not valid:
+    #    errors[CONF_AMAZON_CUSTOM_IMG_FILE] = "file_not_found"
 
     # validate ups custom file exists
     if user_input.get(CONF_UPS_CUSTOM_IMG) and CONF_UPS_CUSTOM_IMG_FILE in user_input:
@@ -272,9 +272,9 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
             vol.Optional(
                 CONF_CUSTOM_IMG, default=_get_default(CONF_CUSTOM_IMG)
             ): cv.boolean,
-            vol.Optional(
-                CONF_AMAZON_CUSTOM_IMG, default=_get_default(CONF_AMAZON_CUSTOM_IMG)
-            ): cv.boolean,
+            #vol.Optional(
+            #    CONF_AMAZON_CUSTOM_IMG, default=_get_default(CONF_AMAZON_CUSTOM_IMG)
+            #): cv.boolean,
             vol.Optional(
                 CONF_UPS_CUSTOM_IMG, default=_get_default(CONF_UPS_CUSTOM_IMG)
             ): cv.boolean,
@@ -297,12 +297,12 @@ def _get_schema_step_3(user_input: list, default_dict: list) -> Any:
                 CONF_CUSTOM_IMG_FILE,
                 default=_get_default(CONF_CUSTOM_IMG_FILE, DEFAULT_CUSTOM_IMG_FILE),
             ): cv.string,
-            vol.Optional(
-                CONF_AMAZON_CUSTOM_IMG_FILE,
-                default=_get_default(
-                    CONF_AMAZON_CUSTOM_IMG_FILE, DEFAULT_AMAZON_CUSTOM_IMG_FILE
-                ),
-            ): cv.string,
+            #vol.Optional(
+            #    CONF_AMAZON_CUSTOM_IMG_FILE,
+            #    default=_get_default(
+            #        CONF_AMAZON_CUSTOM_IMG_FILE, DEFAULT_AMAZON_CUSTOM_IMG_FILE
+            #    ),
+            #): cv.string,
             vol.Optional(
                 CONF_UPS_CUSTOM_IMG_FILE,
                 default=_get_default(
