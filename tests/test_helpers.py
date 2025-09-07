@@ -1886,3 +1886,143 @@ def migrate_config(config: dict, version: int) -> dict:
         migrated_config[CONF_UPS_CUSTOM_IMG_FILE] = DEFAULT_UPS_CUSTOM_IMG_FILE
 
     return migrated_config
+
+
+# Tests for Amazon forwarded email fix
+async def test_process_amazon_forwards_filters_non_amazon_domains():
+    """Test that _process_amazon_forwards filters out non-Amazon domains."""
+    from custom_components.mail_and_packages.helpers import _process_amazon_forwards
+    
+    # Test with non-Amazon forwarded address
+    non_amazon_forward = "testingEmail@gmail.com"
+    result = _process_amazon_forwards(non_amazon_forward)
+    
+    # Should be empty since testingEmail@gmail.com is not an Amazon domain
+    assert result == []
+    
+    # Test with Amazon forwarded address
+    amazon_forward = "auto-confirm@amazon.com"
+    result = _process_amazon_forwards(amazon_forward)
+    
+    # Should include the Amazon address
+    assert amazon_forward in result
+
+
+async def test_amazon_email_addresses_filters_forwarded_addresses():
+    """Test that amazon_email_addresses filters out non-Amazon forwarded addresses."""
+    from custom_components.mail_and_packages.helpers import amazon_email_addresses
+    
+    # Test with non-Amazon forwarded address
+    fwds = "testingEmail@gmail.com"
+    the_domain = "amazon.com"
+    
+    result = amazon_email_addresses(fwds, the_domain)
+    
+    # Should not include the non-Amazon forwarded address
+    assert "testingEmail@gmail.com" not in result
+    
+    # Should include Amazon domain addresses
+    assert any("amazon.com" in addr for addr in result)
+
+
+async def test_amazon_search_does_not_find_non_amazon_forwarded_email():
+    """Test that amazon_search doesn't find emails from non-Amazon forwarded addresses."""
+    from custom_components.mail_and_packages.helpers import amazon_search
+    
+    # Mock the dependencies
+    mock_account = mock.Mock()
+    mock_hass = mock.Mock()
+    
+    # Test parameters
+    image_path = "/test/images/"
+    amazon_image_name = "test_amazon.jpg"
+    amazon_domain = "amazon.com"
+    fwds = "testingEmail@gmail.com"  # Non-Amazon forwarded address
+    
+    # Mock email_search to return no results (since non-Amazon addresses are filtered out)
+    with patch('custom_components.mail_and_packages.helpers.email_search') as mock_email_search:
+        mock_email_search.return_value = ("OK", [None])
+        
+        # Mock get_amazon_image to avoid file operations
+        with patch('custom_components.mail_and_packages.helpers.get_amazon_image'):
+            # Mock cleanup_images to avoid file operations
+            with patch('custom_components.mail_and_packages.helpers.cleanup_images'):
+                # Mock copyfile to avoid file operations
+                with patch('custom_components.mail_and_packages.helpers.copyfile'):
+                    # Call amazon_search
+                    result = amazon_search(
+                        mock_account,
+                        image_path,
+                        mock_hass,
+                        amazon_image_name,
+                        amazon_domain,
+                        fwds
+                    )
+    
+    # Should return 0 since no emails should be found
+    assert result == 0
+    
+    # Verify that email_search was called with filtered address list
+    assert mock_email_search.called
+    
+    # Check that all calls used filtered address lists (no non-Amazon addresses)
+    for call_args in mock_email_search.call_args_list:
+        args, kwargs = call_args
+        address_list = args[1]  # Second argument is address_list
+        
+        # Should not contain the non-Amazon forwarded address
+        assert "testingEmail@gmail.com" not in address_list
+
+
+async def test_get_items_does_not_find_non_amazon_emails():
+    """Test that get_items function doesn't find emails from non-Amazon forwarded addresses."""
+    from custom_components.mail_and_packages.helpers import get_items
+    
+    # Mock the dependencies
+    mock_account = mock.Mock()
+    
+    # Mock email_search to return no results
+    with patch('custom_components.mail_and_packages.helpers.email_search') as mock_email_search:
+        mock_email_search.return_value = ("OK", [None])
+        
+        # Mock email_fetch to avoid file operations
+        with patch('custom_components.mail_and_packages.helpers.email_fetch'):
+            # Test with non-Amazon forwarded address
+            fwds = "testingEmail@gmail.com"
+            the_domain = "amazon.com"
+            
+            result = get_items(mock_account, "count", fwds, 7, the_domain)
+    
+    # Should return 0 since no emails should be found
+    assert result == 0
+    
+    # Verify that email_search was called with filtered address list
+    assert mock_email_search.called
+    
+    # The address list should not contain the non-Amazon forwarded address
+    call_args = mock_email_search.call_args
+    address_list = call_args[0][1]  # Second argument is address_list
+    assert "testingEmail@gmail.com" not in address_list
+
+
+async def test_real_email_subject_patterns_do_not_match():
+    """Test that the real test email subjects don't match Amazon patterns."""
+    from custom_components.mail_and_packages.const import AMAZON_DELIVERED_SUBJECT
+    
+    # Test subjects from the real non_amazon_delivered.eml file
+    test_outer_subject = "Fwd: Your package has been successfully delivered"
+    test_inner_subject = "Your package has been successfully delivered"
+    
+    # Test outer subject
+    outer_matches = [
+        pattern for pattern in AMAZON_DELIVERED_SUBJECT
+        if pattern.lower() in test_outer_subject.lower()
+    ]
+    assert len(outer_matches) == 0, f"Outer subject should not match Amazon patterns, but matched: {outer_matches}"
+    
+    # Test inner subject
+    inner_matches = [
+        pattern for pattern in AMAZON_DELIVERED_SUBJECT
+        if pattern.lower() in test_inner_subject.lower()
+    ]
+    assert len(inner_matches) == 0, f"Inner subject should not match Amazon patterns, but matched: {inner_matches}"
