@@ -1354,6 +1354,23 @@ CAMERA_DATA = {
     "generic_camera": ["Mail Generic Delivery Camera"],
 }
 
+# Configuration for shipper-specific image extraction parameters
+# Only contains values that cannot be derived from shipper_name
+CAMERA_EXTRACTION_CONFIG = {
+    "ups": {
+        "image_type": "jpeg",
+        "cid_name": "deliveryPhoto",
+    },
+    "walmart": {
+        "image_type": "png",
+        "cid_name": "deliveryProofLabel",
+    },
+    "fedex": {
+        "image_type": "jpeg",
+        "attachment_filename_pattern": "delivery",
+    },
+}
+
 # Sensor Index
 SENSOR_NAME = 0
 SENSOR_UNIT = 1

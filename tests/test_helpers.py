@@ -14,16 +14,20 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.mail_and_packages.const import (
     ATTR_COUNT,
+    ATTR_FEDEX_IMAGE,
     ATTR_TRACKING,
     ATTR_WALMART_IMAGE,
     CAMERA_DATA,
     CONF_AMAZON_CUSTOM_IMG,
     CONF_AMAZON_CUSTOM_IMG_FILE,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
     CONF_UPS_CUSTOM_IMG,
     CONF_UPS_CUSTOM_IMG_FILE,
     CONF_WALMART_CUSTOM_IMG,
     CONF_WALMART_CUSTOM_IMG_FILE,
     DEFAULT_AMAZON_CUSTOM_IMG_FILE,
+    DEFAULT_FEDEX_CUSTOM_IMG_FILE,
     DEFAULT_UPS_CUSTOM_IMG_FILE,
     DEFAULT_WALMART_CUSTOM_IMG_FILE,
     DOMAIN,
@@ -49,8 +53,6 @@ from custom_components.mail_and_packages.helpers import (
     get_mails,
     get_resources,
     get_tracking,
-    get_ups_image,
-    get_walmart_image,
     hash_file,
     image_file_name,
     login,
@@ -58,8 +60,6 @@ from custom_components.mail_and_packages.helpers import (
     resize_images,
     selectfolder,
     update_time,
-    ups_search,
-    walmart_search,
 )
 from tests.const import (
     FAKE_CONFIG_DATA,
@@ -2674,6 +2674,129 @@ async def test_walmart_search_error_handling():
 
     # Should return 0 when path is invalid
     assert result == 0
+
+
+async def test_fedex_image_extraction():
+    """Test that FedEx delivery photos are correctly extracted from emails."""
+    # Mock the dependencies
+    mock_account = MagicMock()
+    mock_hass = MagicMock()
+
+    # Test parameters
+    image_path = "/test/images/"
+    image_name = "test_fedex.jpg"
+
+    # Read the actual test email content
+    with open("tests/test_emails/fedex_delivered.eml", "r", encoding="utf-8") as f:
+        test_email_content = f.read()
+
+    # Mock file operations
+    with patch(
+        "custom_components.mail_and_packages.helpers.os.path.isdir"
+    ) as mock_isdir:
+        mock_isdir.return_value = True
+        with patch("builtins.open", mock.mock_open()) as mock_file:
+            # Call _generic_delivery_image_extraction directly
+            from custom_components.mail_and_packages.helpers import (
+                _generic_delivery_image_extraction,
+            )
+
+            result = _generic_delivery_image_extraction(
+                test_email_content,
+                image_path,
+                image_name,
+                "fedex",
+                "jpeg",
+                attachment_filename_pattern="delivery",
+            )
+
+    # Should return True since the email contains a delivery photo
+    assert (
+        result is True
+    ), "FedEx image extraction should return True for email with delivery photo"
+
+
+async def test_fedex_camera_integration():
+    """Test that FedEx camera is properly integrated with coordinator data."""
+    # Test that FedEx camera is defined in CAMERA_DATA
+    assert (
+        "fedex_camera" in CAMERA_DATA
+    ), "FedEx camera should be defined in CAMERA_DATA"
+    assert (
+        CAMERA_DATA["fedex_camera"][0] == "Mail FedEx Delivery Camera"
+    ), "FedEx camera should have correct name"
+
+    # Test that ATTR_FEDEX_IMAGE constant exists
+    assert (
+        ATTR_FEDEX_IMAGE == "fedex_image"
+    ), "ATTR_FEDEX_IMAGE should be defined correctly"
+
+
+async def test_fedex_no_deliveries_handling():
+    """Test that FedEx handles no deliveries correctly."""
+    # Mock the dependencies
+    mock_account = MagicMock()
+    mock_hass = MagicMock()
+
+    # Test parameters
+    image_path = "/test/images/"
+    fedex_image_name = "test_fedex.jpg"
+    coordinator_data = {}
+
+    # Mock email_search to return no emails
+    with patch(
+        "custom_components.mail_and_packages.helpers.email_search"
+    ) as mock_email_search:
+        mock_email_search.return_value = ("OK", [None])  # No emails found
+
+        # Mock file operations
+        with patch(
+            "custom_components.mail_and_packages.helpers.os.path.isdir"
+        ) as mock_isdir:
+            mock_isdir.return_value = True
+            with patch(
+                "custom_components.mail_and_packages.helpers.copyfile"
+            ) as mock_copyfile:
+                # Call _generic_delivery_search directly
+                from custom_components.mail_and_packages.helpers import (
+                    _generic_delivery_search,
+                )
+
+                result = _generic_delivery_search(
+                    mock_account,
+                    image_path,
+                    mock_hass,
+                    fedex_image_name,
+                    "fedex",
+                    "fedex_delivered",
+                    ATTR_FEDEX_IMAGE,
+                    "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                    coordinator_data,
+                    image_type="jpeg",
+                    attachment_filename_pattern="delivery",
+                )
+
+    # Should return 0 since no emails were found
+    assert result == 0, f"Expected 0 FedEx deliveries, got {result}"
+
+    # Verify that coordinator data was updated with no-delivery image
+    assert (
+        ATTR_FEDEX_IMAGE in coordinator_data
+    ), "FedEx image should be set in coordinator data even with no deliveries"
+
+    # Verify that copyfile was called to create no-delivery image
+    assert mock_copyfile.called, "copyfile should be called to create no-delivery image"
+
+
+async def test_fedex_custom_image_support():
+    """Test that FedEx supports custom images like UPS, Walmart, and Amazon."""
+    # Test that custom image constants are defined
+    assert CONF_FEDEX_CUSTOM_IMG == "fedex_custom_img"
+    assert CONF_FEDEX_CUSTOM_IMG_FILE == "fedex_custom_img_file"
+    assert (
+        DEFAULT_FEDEX_CUSTOM_IMG_FILE
+        == "custom_components/mail_and_packages/no_deliveries_fedex.jpg"
+    )
 
 
 async def test_ups_search_error_handling():

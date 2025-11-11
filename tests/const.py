@@ -797,6 +797,8 @@ FAKE_CONFIG_DATA_CUSTOM_IMG = {
     "ups_custom_img_file": "images/test_ups.jpg",
     "walmart_custom_img": True,
     "walmart_custom_img_file": "images/test_walmart.jpg",
+    "fedex_custom_img": True,
+    "fedex_custom_img_file": "images/test_fedex.jpg",
     "generic_custom_img": True,
     "generic_custom_img_file": "images/test_generic.jpg",
     "folder": '"INBOX"',

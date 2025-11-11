@@ -36,7 +36,11 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.util import ssl
 
+<<<<<<< HEAD
 
+=======
+from . import const
+>>>>>>> 999a254 (simplify logic)
 from .const import (
     AMAZON_DELIEVERED_BY_OTHERS_SEARCH_TEXT,
     AMAZON_DELIVERED,
@@ -113,6 +117,8 @@ from .const import (
     SENSOR_DATA,
     SENSOR_TYPES,
     SHIPPERS,
+    CAMERA_DATA,
+    CAMERA_EXTRACTION_CONFIG,
 )
 
 NO_SSL = "Email will be accessed without encryption using this method and is not recommended."
@@ -264,6 +270,13 @@ def process_emails(hass: HomeAssistant, config: ConfigEntry) -> dict:
     _image[ATTR_WALMART_IMAGE] = walmart_image_name
     _LOGGER.debug("Set ATTR_WALMART_IMAGE in coordinator data: %s", walmart_image_name)
 
+    # FedEx delivery image name
+    _LOGGER.debug("Generating FedEx image name...")
+    fedex_image_name = image_file_name(hass, config, fedex=True)
+    _LOGGER.debug("FedEx Image Name: %s", fedex_image_name)
+    _image[ATTR_FEDEX_IMAGE] = fedex_image_name
+    _LOGGER.debug("Set ATTR_FEDEX_IMAGE in coordinator data: %s", fedex_image_name)
+
     # Ensure UPS directory exists and has a default image
     ups_path = f"{hass.config.path()}/{default_image_path(hass, config)}ups/"
     if not os.path.isdir(ups_path):
@@ -281,6 +294,15 @@ def process_emails(hass: HomeAssistant, config: ConfigEntry) -> dict:
             _LOGGER.debug("Created Walmart directory: %s", walmart_path)
         except Exception as err:
             _LOGGER.error("Error creating Walmart directory: %s", str(err))
+
+    # Ensure FedEx directory exists and has a default image
+    fedex_path = f"{hass.config.path()}/{default_image_path(hass, config)}fedex/"
+    if not os.path.isdir(fedex_path):
+        try:
+            os.makedirs(fedex_path)
+            _LOGGER.debug("Created FedEx directory: %s", fedex_path)
+        except Exception as err:
+            _LOGGER.error("Error creating FedEx directory: %s", str(err))
 
     # Check if UPS image file exists
     ups_image_path = f"{ups_path}{ups_image_name}"
@@ -312,6 +334,21 @@ def process_emails(hass: HomeAssistant, config: ConfigEntry) -> dict:
             _LOGGER.error("Error creating default Walmart image: %s", str(err))
     else:
         _LOGGER.debug("Walmart image file exists: %s", walmart_image_path)
+
+    # Check if FedEx image file exists
+    fedex_image_path = f"{fedex_path}{fedex_image_name}"
+    if not os.path.exists(fedex_image_path):
+        _LOGGER.debug(
+            "FedEx image file does not exist, creating default: %s", fedex_image_path
+        )
+        try:
+            nomail = f"{os.path.dirname(__file__)}/no_deliveries_fedex.jpg"
+            copyfile(nomail, fedex_image_path)
+            _LOGGER.debug("Created default FedEx image: %s", fedex_image_path)
+        except Exception as err:
+            _LOGGER.error("Error creating default FedEx image: %s", str(err))
+    else:
+        _LOGGER.debug("FedEx image file exists: %s", fedex_image_path)
 
     image_path = default_image_path(hass, config)
     _LOGGER.debug("Image path: %s", image_path)
@@ -1252,6 +1289,7 @@ def get_count(
         result[ATTR_TRACKING] = ""
         return result
 
+<<<<<<< HEAD
     # Return UPS delivered info
     if sensor_type == "ups_delivered":
         ups_image_name = (
@@ -1378,6 +1416,8 @@ def get_count(
             result[ATTR_TRACKING] = ""
         return result
 
+=======
+>>>>>>> 999a254 (simplify logic)
     # Bail out if unknown sensor type
     if ATTR_EMAIL not in SENSOR_DATA[sensor_type]:
         _LOGGER.debug("Unknown sensor type: %s", str(sensor_type))
@@ -1385,6 +1425,7 @@ def get_count(
         result[ATTR_TRACKING] = ""
         return result
 
+<<<<<<< HEAD
     if forwarded_emails:
         email_addresses = forwarded_emails + SENSOR_DATA[sensor_type][ATTR_EMAIL]
     else:
@@ -1395,25 +1436,130 @@ def get_count(
         _LOGGER.debug(
             "Attempting to find mail from (%s) with subject (%s)",
             email_addresses,
+=======
+    # Check if this is a generic delivery sensor with image extraction (UPS, Walmart, FedEx)
+    # Derive shipper_name from sensor_type (e.g., "ups_delivered" -> "ups")
+    shipper_name = None
+    if sensor_type.endswith("_delivered"):
+        potential_shipper = sensor_type.replace("_delivered", "")
+        camera_key = f"{potential_shipper}_camera"
+        # Check if this shipper has a camera in CAMERA_DATA (excluding usps_camera and generic_camera)
+        if camera_key in CAMERA_DATA and camera_key not in (
+            "usps_camera",
+            "generic_camera",
+        ):
+            shipper_name = potential_shipper
+
+    # Setup image extraction if this is a generic delivery sensor
+    image_attr = None
+    image_name = None
+    shipper_path = None
+    no_delivery_image_file = None
+    extraction_config = {}
+    new_image_saved = False
+    if shipper_name:
+        # Derive all values from shipper_name
+        image_attr_name = f"ATTR_{shipper_name.upper()}_IMAGE"
+        image_attr = getattr(const, image_attr_name, None)
+        if image_attr is None:
+            _LOGGER.error(
+                "Could not find image attribute %s for %s",
+                image_attr_name,
+                shipper_name,
+            )
+            result[ATTR_COUNT] = count
+            result[ATTR_TRACKING] = ""
+            return result
+
+        default_image_name = f"{shipper_name}_delivery.jpg"
+        no_delivery_image_file = (
+            f"{os.path.dirname(__file__)}/no_deliveries_{shipper_name}.jpg"
+        )
+
+        # Get shipper-specific extraction config
+        extraction_config = CAMERA_EXTRACTION_CONFIG.get(shipper_name, {})
+        image_type = extraction_config.get("image_type", "jpeg")
+        cid_name = extraction_config.get("cid_name")
+        attachment_filename_pattern = extraction_config.get(
+            "attachment_filename_pattern"
+        )
+
+        image_name = (
+            data.get(image_attr, default_image_name) if data else default_image_name
+        )
+        shipper_path = f"{image_path}{shipper_name}/"
+
+        # Create directory if needed
+        if not os.path.isdir(shipper_path):
+            try:
+                os.makedirs(shipper_path)
+            except Exception as err:
+                _LOGGER.critical("Error creating directory: %s", str(err))
+                result[ATTR_COUNT] = count
+                result[ATTR_TRACKING] = ""
+                return result
+
+    # Cache sensor data to avoid repeated lookups
+    sensor_data = SENSOR_DATA[sensor_type]
+
+    # Loop through all subjects (unified path for both generic delivery and normal sensors)
+    subjects = sensor_data[ATTR_SUBJECT]
+    sensor_email = sensor_data[ATTR_EMAIL]
+    is_delivered_sensor = sensor_type.endswith("_delivered")
+    for subject in subjects:
+        _LOGGER.debug(
+            "Attempting to find mail from (%s) with subject (%s)",
+            sensor_email,
+>>>>>>> 999a254 (simplify logic)
             subject,
         )
 
         (server_response, email_data) = email_search(
+<<<<<<< HEAD
             account, email_addresses, today, subject
+=======
+            account, sensor_email, today, subject
+>>>>>>> 999a254 (simplify logic)
         )
         if server_response == "OK" and email_data[0] is not None:
-            if ATTR_BODY in SENSOR_DATA[sensor_type].keys():
-                body_count = SENSOR_DATA[sensor_type].get(ATTR_BODY_COUNT, False)
+            # Count emails using less intensive method (same for both paths)
+            if ATTR_BODY in sensor_data:
+                body_count = sensor_data.get(ATTR_BODY_COUNT, False)
                 _LOGGER.debug("Check body for mail count? %s", body_count)
                 count += find_text(
-                    email_data, account, SENSOR_DATA[sensor_type][ATTR_BODY], body_count
+                    email_data,
+                    account,
+                    sensor_data[ATTR_BODY],
+                    body_count,
                 )
             else:
                 count += len(email_data[0].split())
 
+            # If generic delivery sensor, extract images from emails
+            if shipper_name:
+                for email_id in email_data[0].split():
+                    msg = email_fetch(account, email_id, "(RFC822)")[1]
+                    for response_part in msg:
+                        if isinstance(response_part, tuple):
+                            sdata = response_part[1].decode("utf-8", "ignore")
+                            if _generic_delivery_image_extraction(
+                                sdata,
+                                image_path,
+                                image_name,
+                                shipper_name,
+                                image_type,
+                                cid_name,
+                                attachment_filename_pattern,
+                            ):
+                                new_image_saved = True
+
             _LOGGER.debug(
                 "Search for (%s) with subject (%s) results: %s count: %s",
+<<<<<<< HEAD
                 email_addresses,
+=======
+                sensor_email,
+>>>>>>> 999a254 (simplify logic)
                 subject,
                 email_data[0],
                 count,
@@ -1424,12 +1570,15 @@ def get_count(
             # USPS will say delivered for: "AMAZON" in their email. This is used to
             # fix in transit.
             if (
-                sensor_type.endswith("_delivered")
+                is_delivered_sensor
                 and sensor_type != AMAZON_DELIVERED
                 and data is not None
             ):
                 amazon_mentions = find_text(
-                    email_data, account, AMAZON_DELIEVERED_BY_OTHERS_SEARCH_TEXT, False
+                    email_data,
+                    account,
+                    AMAZON_DELIEVERED_BY_OTHERS_SEARCH_TEXT,
+                    False,
                 )
                 if amazon_mentions > 0:
                     data["amazon_delivered_by_others"] = (
@@ -1441,14 +1590,35 @@ def get_count(
                         amazon_mentions,
                     )
 
+    # Handle generic delivery sensor post-processing
+    if shipper_name:
+        # Clean up image directory (after processing to minimize interruption)
+        cleanup_images(shipper_path)
+
+        # If no emails found, set default image
+        if count == 0 and no_delivery_image_file:
+            try:
+                copyfile(no_delivery_image_file, shipper_path + image_name)
+                if data is not None:
+                    data[image_attr] = image_name
+            except Exception as err:
+                _LOGGER.error("Error attempting to copy image: %s", str(err))
+
+        # Update coordinator data if new image was saved
+        if new_image_saved and data is not None:
+            for file in os.listdir(shipper_path):
+                # Check for common image extensions
+                if file.endswith((".jpg", ".jpeg", ".png", ".gif")):
+                    data[image_attr] = file
+                    break
+
+    # Derive tracking sensor key (e.g., "ups_delivered" -> "ups_tracking")
+    tracking_sensor_key = f"{'_'.join(sensor_type.split('_')[:-1])}_tracking"
     if (
-        f"{'_'.join(sensor_type.split('_')[:-1])}_tracking" in SENSOR_DATA
-        and ATTR_PATTERN
-        in SENSOR_DATA[f"{'_'.join(sensor_type.split('_')[:-1])}_tracking"].keys()
+        tracking_sensor_key in SENSOR_DATA
+        and ATTR_PATTERN in SENSOR_DATA[tracking_sensor_key]
     ):
-        track = SENSOR_DATA[f"{'_'.join(sensor_type.split('_')[:-1])}_tracking"][
-            ATTR_PATTERN
-        ][0]
+        track = SENSOR_DATA[tracking_sensor_key][ATTR_PATTERN][0]
 
     if track is not None and get_tracking_num and count > 0:
         for sdata in found:
@@ -1587,6 +1757,7 @@ def find_text(
     return count
 
 
+<<<<<<< HEAD
 def _generic_delivery_search(
     account: Type[imaplib.IMAP4_SSL],
     image_path: str,
@@ -1706,6 +1877,8 @@ def _generic_delivery_search(
     return count
 
 
+=======
+>>>>>>> 999a254 (simplify logic)
 def _generic_delivery_image_extraction(
     sdata: Any,
     image_path: str,
