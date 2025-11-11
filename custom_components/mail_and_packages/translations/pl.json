@@ -42,6 +42,7 @@
           "amazon_custom_img": "Użyć niestandardowego obrazu Amazon 'brak dostawy'?",
           "ups_custom_img": "Użyć niestandardowego obrazu UPS 'brak dostawy'?",
           "walmart_custom_img": "Użyć niestandardowego obrazu Walmart 'brak dostawy'?",
+          "fedex_custom_img": "Użyć niestandardowego obrazu FedEx 'brak dostawy'?",
           "generic_custom_img": "Użyć niestandardowego obrazu ogólnego 'brak dostawy'?",
           "generate_grid": "Utwórz siatkę obrazów dla modeli wizji LLM",
           "allow_forwarded_emails": "Zezwalaj na przesyłanie dalej wiadomości e-mail oprócz domyślnej usługi (np. no-reply@usps.com)"
@@ -92,6 +93,7 @@
           "amazon_custom_img": "Użyć niestandardowego obrazu Amazon 'brak dostawy'?",
           "ups_custom_img": "Użyć niestandardowego obrazu UPS 'brak dostawy'?",
           "walmart_custom_img": "Użyć niestandardowego obrazu Walmart 'brak dostawy'?",
+          "fedex_custom_img": "Użyć niestandardowego obrazu FedEx 'brak dostawy'?",
           "generic_custom_img": "Użyć niestandardowego obrazu ogólnego 'brak dostawy'?",
           "generate_grid": "Utwórz siatkę obrazów dla modeli wizji LLM",
           "allow_forwarded_emails": "Zezwalaj na przesyłanie dalej wiadomości e-mail oprócz domyślnej usługi (np. no-reply@usps.com)"

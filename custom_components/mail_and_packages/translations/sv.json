@@ -42,6 +42,7 @@
           "amazon_custom_img": "Använd anpassad Amazon 'ingen leverans' bild?",
           "ups_custom_img": "Använd anpassad UPS 'ingen leverans' bild?",
           "walmart_custom_img": "Använd anpassad Walmart 'ingen leverans' bild?",
+          "fedex_custom_img": "Använd anpassad FedEx 'ingen leverans' bild?",
           "generic_custom_img": "Använd anpassad generisk 'ingen leverans' bild?",
           "generate_grid": "Skapa bildrutnät för LLM-visionsmodeller",
           "allow_forwarded_emails": "Tillåt vidarebefordrade e-postmeddelanden utöver en tjänsts standardvärde (t.ex. no-reply@usps.com)"
@@ -91,8 +92,11 @@
           "custom_img": "Använd anpassad USPS 'inget post' bild?",
           "amazon_custom_img": "Använd anpassad Amazon 'ingen leverans' bild?",
           "ups_custom_img": "Använd anpassad UPS 'ingen leverans' bild?",
-          "generate_grid": "Skapa bildrutnät för LLM-visionsmodeller",
-          "allow_forwarded_emails": "Tillåt vidarebefordrade e-postmeddelanden utöver en tjänsts standardvärde (t.ex. no-reply@usps.com)"
+          "allow_forwarded_emails": "Tillåt vidarebefordrade e-postmeddelanden utöver en tjänsts standardvärde (t.ex. no-reply@usps.com)",
+          "walmart_custom_img": "Använd anpassad Walmart 'ingen leverans' bild?",
+          "fedex_custom_img": "Använd anpassad FedEx 'ingen leverans' bild?",
+          "generic_custom_img": "Använd anpassad generisk 'ingen leverans' bild?",
+          "generate_grid": "Skapa bildrutnät för LLM-visionsmodeller"
         },
         "description": "Slutför konfigurationen genom att anpassa följande baserat på din e-poststruktur och Home Assistant-installation.\n\nFör detaljer om [Mail and Packages integration](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) alternativen granska [konfiguration, mallar och automatiseringssektionen](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Configuration-and-Email-Settings#configuration) på GitHub.\n\nOm du använder vidarebefordrade e-postmeddelanden från Amazon, separera varje adress med ett kommatecken eller ange (none) för att rensa denna inställning.",
         "title": "Mail och paket (steg 2 av 2)"
