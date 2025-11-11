@@ -215,7 +215,7 @@ async def async_migrate_entry(hass, config_entry):
             )
 
     if version < 12:
-        # Add default Walmart, FedEx, and Generic custom image configurations
+        # Add default Walmart and Generic custom image configurations
         if CONF_WALMART_CUSTOM_IMG not in updated_config:
             updated_config[CONF_WALMART_CUSTOM_IMG] = False
         if CONF_WALMART_CUSTOM_IMG_FILE not in updated_config:
@@ -230,13 +230,7 @@ async def async_migrate_entry(hass, config_entry):
             )
 
     if version < 13:
-        # Add default Walmart, FedEx, and Generic custom image configurations
-        if CONF_WALMART_CUSTOM_IMG not in updated_config:
-            updated_config[CONF_WALMART_CUSTOM_IMG] = False
-        if CONF_WALMART_CUSTOM_IMG_FILE not in updated_config:
-            updated_config[CONF_WALMART_CUSTOM_IMG_FILE] = (
-                "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
-            )
+        # Add default FedEx and Generic custom image configurations
         if CONF_FEDEX_CUSTOM_IMG not in updated_config:
             updated_config[CONF_FEDEX_CUSTOM_IMG] = False
         if CONF_FEDEX_CUSTOM_IMG_FILE not in updated_config:
