@@ -29,6 +29,8 @@ from .const import (
     CONF_UPS_CUSTOM_IMG_FILE,
     CONF_WALMART_CUSTOM_IMG,
     CONF_WALMART_CUSTOM_IMG_FILE,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
     CONF_DURATION,
@@ -57,6 +59,8 @@ from .const import (
     DEFAULT_UPS_CUSTOM_IMG_FILE,
     DEFAULT_WALMART_CUSTOM_IMG,
     DEFAULT_WALMART_CUSTOM_IMG_FILE,
+    DEFAULT_FEDEX_CUSTOM_IMG,
+    DEFAULT_FEDEX_CUSTOM_IMG_FILE,
     DEFAULT_GENERIC_CUSTOM_IMG,
     DEFAULT_GENERIC_CUSTOM_IMG_FILE,
     DEFAULT_FOLDER,
@@ -258,6 +262,18 @@ async def _validate_user_input(user_input: dict) -> tuple:
     if not valid:
         errors[CONF_WALMART_CUSTOM_IMG_FILE] = "file_not_found"
 
+    # validate fedex custom file exists
+    if (
+        user_input.get(CONF_FEDEX_CUSTOM_IMG)
+        and CONF_FEDEX_CUSTOM_IMG_FILE in user_input
+    ):
+        valid = path.isfile(user_input[CONF_FEDEX_CUSTOM_IMG_FILE])
+    else:
+        valid = True
+
+    if not valid:
+        errors[CONF_FEDEX_CUSTOM_IMG_FILE] = "file_not_found"
+
     # validate generic custom file exists
     if (
         user_input.get(CONF_GENERIC_CUSTOM_IMG)
@@ -395,6 +411,9 @@ def _get_schema_step_2(data: list, user_input: list, default_dict: list) -> Any:
                 CONF_WALMART_CUSTOM_IMG, default=_get_default(CONF_WALMART_CUSTOM_IMG)
             ): cv.boolean,
             vol.Optional(
+                CONF_FEDEX_CUSTOM_IMG, default=_get_default(CONF_FEDEX_CUSTOM_IMG)
+            ): cv.boolean,
+            vol.Optional(
                 CONF_GENERIC_CUSTOM_IMG, default=_get_default(CONF_GENERIC_CUSTOM_IMG)
             ): cv.boolean,
         }
@@ -450,6 +469,17 @@ def _get_schema_step_3(user_input: list, default_dict: list) -> Any:
                 CONF_WALMART_CUSTOM_IMG_FILE,
                 default=_get_default(
                     CONF_WALMART_CUSTOM_IMG_FILE, DEFAULT_WALMART_CUSTOM_IMG_FILE
+                ),
+            )
+        ] = cv.string
+
+    # Only show FedEx custom image file field if FedEx custom image is enabled
+    if user_input.get(CONF_FEDEX_CUSTOM_IMG):
+        schema[
+            vol.Optional(
+                CONF_FEDEX_CUSTOM_IMG_FILE,
+                default=_get_default(
+                    CONF_FEDEX_CUSTOM_IMG_FILE, DEFAULT_FEDEX_CUSTOM_IMG_FILE
                 ),
             )
         ] = cv.string
@@ -598,6 +628,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
+                    or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
                 ):
                     return await self.async_step_config_3()
@@ -625,6 +656,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_AMAZON_CUSTOM_IMG: DEFAULT_AMAZON_CUSTOM_IMG,
             CONF_UPS_CUSTOM_IMG: DEFAULT_UPS_CUSTOM_IMG,
             CONF_WALMART_CUSTOM_IMG: DEFAULT_WALMART_CUSTOM_IMG,
+            CONF_FEDEX_CUSTOM_IMG: DEFAULT_FEDEX_CUSTOM_IMG,
             CONF_GENERIC_CUSTOM_IMG: DEFAULT_GENERIC_CUSTOM_IMG,
             CONF_ALLOW_FORWARDED_EMAILS: DEFAULT_ALLOW_FORWARDED_EMAILS,
         }
@@ -655,6 +687,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_AMAZON_CUSTOM_IMG_FILE: DEFAULT_AMAZON_CUSTOM_IMG_FILE,
             CONF_UPS_CUSTOM_IMG_FILE: DEFAULT_UPS_CUSTOM_IMG_FILE,
             CONF_WALMART_CUSTOM_IMG_FILE: DEFAULT_WALMART_CUSTOM_IMG_FILE,
+            CONF_FEDEX_CUSTOM_IMG_FILE: DEFAULT_FEDEX_CUSTOM_IMG_FILE,
             CONF_GENERIC_CUSTOM_IMG_FILE: DEFAULT_GENERIC_CUSTOM_IMG_FILE,
         }
 
@@ -813,6 +846,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
+                    or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
                 ):
                     return await self.async_step_reconfig_3()
@@ -854,6 +888,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             CONF_AMAZON_CUSTOM_IMG_FILE: DEFAULT_AMAZON_CUSTOM_IMG_FILE,
             CONF_UPS_CUSTOM_IMG_FILE: DEFAULT_UPS_CUSTOM_IMG_FILE,
             CONF_WALMART_CUSTOM_IMG_FILE: DEFAULT_WALMART_CUSTOM_IMG_FILE,
+            CONF_FEDEX_CUSTOM_IMG_FILE: DEFAULT_FEDEX_CUSTOM_IMG_FILE,
             CONF_GENERIC_CUSTOM_IMG_FILE: DEFAULT_GENERIC_CUSTOM_IMG_FILE,
         }
 
@@ -875,6 +910,7 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
+                    or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
                 ):
                     return await self.async_step_reconfig_3()

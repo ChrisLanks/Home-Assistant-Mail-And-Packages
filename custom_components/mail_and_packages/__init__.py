@@ -26,6 +26,8 @@ from .const import (
     CONF_UPS_CUSTOM_IMG_FILE,
     CONF_WALMART_CUSTOM_IMG,
     CONF_WALMART_CUSTOM_IMG_FILE,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
     CONF_IMAGE_SECURITY,
@@ -213,12 +215,33 @@ async def async_migrate_entry(hass, config_entry):
             )
 
     if version < 12:
-        # Add default Walmart and Generic custom image configurations
+        # Add default Walmart, FedEx, and Generic custom image configurations
         if CONF_WALMART_CUSTOM_IMG not in updated_config:
             updated_config[CONF_WALMART_CUSTOM_IMG] = False
         if CONF_WALMART_CUSTOM_IMG_FILE not in updated_config:
             updated_config[CONF_WALMART_CUSTOM_IMG_FILE] = (
                 "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
+            )
+        if CONF_GENERIC_CUSTOM_IMG not in updated_config:
+            updated_config[CONF_GENERIC_CUSTOM_IMG] = False
+        if CONF_GENERIC_CUSTOM_IMG_FILE not in updated_config:
+            updated_config[CONF_GENERIC_CUSTOM_IMG_FILE] = (
+                "custom_components/mail_and_packages/no_deliveries_generic.jpg"
+            )
+
+    if version < 13:
+        # Add default Walmart, FedEx, and Generic custom image configurations
+        if CONF_WALMART_CUSTOM_IMG not in updated_config:
+            updated_config[CONF_WALMART_CUSTOM_IMG] = False
+        if CONF_WALMART_CUSTOM_IMG_FILE not in updated_config:
+            updated_config[CONF_WALMART_CUSTOM_IMG_FILE] = (
+                "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
+            )
+        if CONF_FEDEX_CUSTOM_IMG not in updated_config:
+            updated_config[CONF_FEDEX_CUSTOM_IMG] = False
+        if CONF_FEDEX_CUSTOM_IMG_FILE not in updated_config:
+            updated_config[CONF_FEDEX_CUSTOM_IMG_FILE] = (
+                "custom_components/mail_and_packages/no_deliveries_fedex.jpg"
             )
         if CONF_GENERIC_CUSTOM_IMG not in updated_config:
             updated_config[CONF_GENERIC_CUSTOM_IMG] = False

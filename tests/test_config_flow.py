@@ -23,6 +23,8 @@ from custom_components.mail_and_packages.const import (
     CONF_AMAZON_CUSTOM_IMG,
     CONF_AMAZON_CUSTOM_IMG_FILE,
     CONF_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
     CONF_GENERATE_MP4,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
@@ -5566,6 +5568,62 @@ async def test_migration_to_version_12(hass: HomeAssistant):
     assert entry.data["walmart_custom_img"] is False
 
 
+async def test_migration_to_version_13(hass: HomeAssistant):
+    """Test migration to version 13 adds new FedEx camera fields."""
+    # Create a mock config entry with version 12
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="imap.test.email",
+        data={
+            "host": "imap.test.email",
+            "port": "993",
+            "username": "test@test.email",
+            "password": "notarealpassword",
+            "imap_security": "SSL",
+            "verify_ssl": False,
+            "allow_external": False,
+            "custom_img": False,
+            "amazon_custom_img": False,
+            "ups_custom_img": False,
+            "walmart_custom_img": False,
+            "generic_custom_img": False,
+            "folder": '"INBOX"',
+            "generate_grid": False,
+            "generate_mp4": False,
+            "resources": ["usps_mail"],
+            "storage": "custom_components/mail_and_packages/images/",
+        },
+        version=12,
+    )
+
+    entry.add_to_hass(hass)
+
+    # Set up the integration (this will trigger migration)
+    with patch(
+        "custom_components.mail_and_packages.helpers._test_login", return_value=True
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    # Verify version was updated to 13
+    assert entry.version == 13
+
+    # Verify new FedEx camera fields were added with defaults
+    assert CONF_FEDEX_CUSTOM_IMG in entry.data
+    assert entry.data[CONF_FEDEX_CUSTOM_IMG] is False
+    assert CONF_FEDEX_CUSTOM_IMG_FILE in entry.data
+    assert (
+        entry.data[CONF_FEDEX_CUSTOM_IMG_FILE]
+        == "custom_components/mail_and_packages/no_deliveries_fedex.jpg"
+    )
+
+    # Verify existing fields were preserved
+    assert entry.data["host"] == "imap.test.email"
+    assert entry.data["amazon_custom_img"] is False
+    assert entry.data["walmart_custom_img"] is False
+    assert entry.data["generic_custom_img"] is False
+
+
 async def test_walmart_config_flow_integration():
     """Test that Walmart custom image support is properly integrated into config flow."""
     # Test 1: Validate Walmart custom image file exists
@@ -5642,6 +5700,14 @@ async def test_walmart_config_flow_version():
     assert (
         CONFIG_VER >= 12
     ), f"Config version should be 12 or higher for Walmart support, got {CONFIG_VER}"
+
+
+async def test_fedex_config_flow_version():
+    """Test that the config version has been incremented for FedEx support."""
+    # Version should be 13 or higher to include FedEx custom image support
+    assert (
+        CONFIG_VER >= 13
+    ), f"Config version should be 13 or higher for FedEx support, got {CONFIG_VER}"
 
 
 async def test_get_mailboxes_non_ok_status():
