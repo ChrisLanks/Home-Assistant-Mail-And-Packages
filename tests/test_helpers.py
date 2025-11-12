@@ -2098,11 +2098,11 @@ async def test_walmart_delivered_email_processing():
                                     mock_extract.return_value = True
                                     # Call get_count for walmart_delivered
                                     result = get_count(
-                                mock_account,
+                                        mock_account,
                                         "walmart_delivered",
                                         False,
-                                image_path,
-                                mock_hass,
+                                        image_path,
+                                        mock_hass,
                                         data=coordinator_data,
                                     )["count"]
 
@@ -3410,125 +3410,113 @@ Thank you for your purchase!
     assert result == 0, f"Expected 0 (no order number found), got {result}"
 
 
-# @pytest.mark.asyncio
-# async def test_zpackages_delivered_matches_sum_of_shippers():
-#     """Test that zpackages_delivered equals the sum of all shipper delivered counts."""
-#     # Mock account
-#     mock_account = MagicMock()
-#     mock_account.host = "imap.test.email"
-#
-#     # Mock config
-#     mock_config = MagicMock()
-#     mock_config.get.return_value = []
-#
-#     # Mock hass
-#     mock_hass = MagicMock()
-#     mock_hass.config.path.return_value = "/test"
-#
-#     # Create data dict with individual shipper delivered counts
-#     # fetch() checks if sensor is in data first, so we can set individual counts directly
-#     data = {
-#         ATTR_IMAGE_NAME: "test.gif",  # Required by fetch()
-#         "amazon_image": "test_amazon.jpg",  # Required by fetch()
-#     }
-#
-#     # Set up individual shipper delivered counts
-#     # UPS: 2 delivered
-#     data["ups_delivered"] = 2
-#     # FedEx: 1 delivered
-#     data["fedex_delivered"] = 1
-#     # Walmart: 1 delivered
-#     data["walmart_delivered"] = 1
-#     # USPS: 0 delivered (not set, should default to 0)
-#
-#     with patch("custom_components.mail_and_packages.helpers.default_image_path", return_value="test/"):
-#         # Calculate zpackages_delivered
-#         # fetch() will recursively call itself for each shipper's delivered count
-#         zpackages_delivered = fetch(
-#             mock_hass, mock_config, mock_account, data, "zpackages_delivered"
-#         )
-#
-#         # Calculate expected sum manually
-#         expected_sum = 0
-#         for shipper in SHIPPERS:
-#             delivered_key = f"{shipper}_delivered"
-#             if delivered_key in data:
-#                 expected_sum += data[delivered_key]
-#
-#         # Verify zpackages_delivered matches the sum
-#         assert zpackages_delivered == expected_sum, (
-#             f"zpackages_delivered ({zpackages_delivered}) should equal "
-#             f"sum of all shipper delivered counts ({expected_sum})"
-#         )
-#         # In this case: 2 + 1 + 1 = 4
-#         assert zpackages_delivered == 4
+@pytest.mark.asyncio
+async def test_zpackages_delivered_matches_sum_of_shippers():
+    """Test that zpackages_delivered equals the sum of all shipper delivered counts."""
+    # Mock account
+    mock_account = MagicMock()
+    mock_account.host = "imap.test.email"
+    # Mock config
+    mock_config = MagicMock()
+    mock_config.get.return_value = []
+    # Mock hass
+    mock_hass = MagicMock()
+    mock_hass.config.path.return_value = "/test"
+    # Create data dict with individual shipper delivered counts
+    # fetch() checks if sensor is in data first, so we can set individual counts directly
+    data = {
+        ATTR_IMAGE_NAME: "test.gif",  # Required by fetch()
+        "amazon_image": "test_amazon.jpg",  # Required by fetch()
+    }
+    # Set up individual shipper delivered counts
+    # UPS: 2 delivered
+    data["ups_delivered"] = 2
+    # FedEx: 1 delivered
+    data["fedex_delivered"] = 1
+    # Walmart: 1 delivered
+    data["walmart_delivered"] = 1
+    # USPS: 0 delivered (not set, should default to 0)
+    with patch(
+        "custom_components.mail_and_packages.helpers.default_image_path",
+        return_value="test/",
+    ):
+        # Calculate zpackages_delivered
+        # fetch() will recursively call itself for each shipper's delivered count
+        zpackages_delivered = fetch(
+            mock_hass, mock_config, mock_account, data, "zpackages_delivered"
+        )
+        # Calculate expected sum manually
+        expected_sum = 0
+        for shipper in SHIPPERS:
+            delivered_key = f"{shipper}_delivered"
+            if delivered_key in data:
+                expected_sum += data[delivered_key]
+        # Verify zpackages_delivered matches the sum
+        assert zpackages_delivered == expected_sum, (
+            f"zpackages_delivered ({zpackages_delivered}) should equal "
+            f"sum of all shipper delivered counts ({expected_sum})"
+        )
+        # In this case: 2 + 1 + 1 = 4
+        assert zpackages_delivered == 4
 
 
-# @pytest.mark.asyncio
-# async def test_zpackages_transit_matches_sum_of_shippers():
-#     """Test that zpackages_transit equals the sum of all shipper delivering counts + Amazon packages."""
-#     # Mock account
-#     mock_account = MagicMock()
-#     mock_account.host = "imap.test.email"
-#
-#     # Mock config
-#     mock_config = MagicMock()
-#     mock_config.get.return_value = []
-#
-#     # Mock hass
-#     mock_hass = MagicMock()
-#     mock_hass.config.path.return_value = "/test"
-#
-#     # Create data dict with individual shipper delivering counts and Amazon packages
-#     # fetch() checks if sensor is in data first, so we can set individual counts directly
-#     data = {
-#         ATTR_IMAGE_NAME: "test.gif",  # Required by fetch()
-#         "amazon_image": "test_amazon.jpg",  # Required by fetch()
-#     }
-#
-#     # Set up individual shipper delivering counts (excluding amazon)
-#     # UPS: 1 delivering
-#     data["ups_delivering"] = 1
-#     # FedEx: 2 delivering
-#     data["fedex_delivering"] = 2
-#     # Walmart: 0 delivering (not set, should default to 0)
-#
-#     # Amazon packages: 3 in transit
-#     data["amazon_packages"] = 3
-#
-#     # Amazon packages delivered by others: 1
-#     data["amazon_delivered_by_others"] = 1
-#
-#     with patch("custom_components.mail_and_packages.helpers.default_image_path", return_value="test/"):
-#         # Calculate zpackages_transit
-#         # fetch() will recursively call itself for each shipper's delivering count
-#         zpackages_transit = fetch(
-#             mock_hass, mock_config, mock_account, data, "zpackages_transit"
-#         )
-#
-#         # Calculate expected sum manually
-#         # Sum of all delivering counts (excluding amazon)
-#         expected_sum = 0
-#         for shipper in SHIPPERS:
-#             if shipper == "amazon":
-#                 continue
-#             delivering_key = f"{shipper}_delivering"
-#             if delivering_key in data:
-#                 expected_sum += data[delivering_key]
-#
-#         # Add Amazon packages
-#         amazon_packages = data.get("amazon_packages", 0)
-#         expected_sum = max(expected_sum, amazon_packages)
-#
-#         # Subtract Amazon packages delivered by others
-#         amazon_delivered_by_others = data.get("amazon_delivered_by_others", 0)
-#         expected_sum -= amazon_delivered_by_others
-#         expected_sum = max(0, expected_sum)
-#
-#         # Verify zpackages_transit matches the expected calculation
-#         assert zpackages_transit == expected_sum, (
-#             f"zpackages_transit ({zpackages_transit}) should equal "
-#             f"sum of delivering counts + amazon_packages - amazon_delivered_by_others ({expected_sum})"
-#         )
-#         # In this case: max(1+2, 3) - 1 = 3 - 1 = 2
-#         assert zpackages_transit == 2
+@pytest.mark.asyncio
+async def test_zpackages_transit_matches_sum_of_shippers():
+    """Test that zpackages_transit equals the sum of all shipper delivering counts + Amazon packages."""
+    # Mock account
+    mock_account = MagicMock()
+    mock_account.host = "imap.test.email"
+    # Mock config
+    mock_config = MagicMock()
+    mock_config.get.return_value = []
+    # Mock hass
+    mock_hass = MagicMock()
+    mock_hass.config.path.return_value = "/test"
+    # Create data dict with individual shipper delivering counts and Amazon packages
+    # fetch() checks if sensor is in data first, so we can set individual counts directly
+    data = {
+        ATTR_IMAGE_NAME: "test.gif",  # Required by fetch()
+        "amazon_image": "test_amazon.jpg",  # Required by fetch()
+    }
+    # Set up individual shipper delivering counts (excluding amazon)
+    # UPS: 1 delivering
+    data["ups_delivering"] = 1
+    # FedEx: 2 delivering
+    data["fedex_delivering"] = 2
+    # Walmart: 0 delivering (not set, should default to 0)
+    # Amazon packages: 3 in transit
+    data["amazon_packages"] = 3
+    # Amazon packages delivered by others: 1
+    data["amazon_delivered_by_others"] = 1
+    with patch(
+        "custom_components.mail_and_packages.helpers.default_image_path",
+        return_value="test/",
+    ):
+        # Calculate zpackages_transit
+        # fetch() will recursively call itself for each shipper's delivering count
+        zpackages_transit = fetch(
+            mock_hass, mock_config, mock_account, data, "zpackages_transit"
+        )
+        # Calculate expected sum manually
+        # Sum of all delivering counts (excluding amazon)
+        expected_sum = 0
+        for shipper in SHIPPERS:
+            if shipper == "amazon":
+                continue
+            delivering_key = f"{shipper}_delivering"
+            if delivering_key in data:
+                expected_sum += data[delivering_key]
+        # Add Amazon packages
+        amazon_packages = data.get("amazon_packages", 0)
+        expected_sum = max(expected_sum, amazon_packages)
+        # Subtract Amazon packages delivered by others
+        amazon_delivered_by_others = data.get("amazon_delivered_by_others", 0)
+        expected_sum -= amazon_delivered_by_others
+        expected_sum = max(0, expected_sum)
+        # Verify zpackages_transit matches the expected calculation
+        assert zpackages_transit == expected_sum, (
+            f"zpackages_transit ({zpackages_transit}) should equal "
+            f"sum of delivering counts + amazon_packages - amazon_delivered_by_others ({expected_sum})"
+        )
+        # In this case: max(1+2, 3) - 1 = 3 - 1 = 2
+        assert zpackages_transit == 2

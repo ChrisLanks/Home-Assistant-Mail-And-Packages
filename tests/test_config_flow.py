@@ -4518,17 +4518,17 @@ async def test_config_flow_with_amazon_custom_image_only(
             "amazon_domain": "amazon.com",
             "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
             "custom_img": False,
-                "amazon_custom_img": True,
-                "amazon_custom_img_file": "images/test_amazon_only.jpg",
-                "ups_custom_img": False,
-                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
-                "walmart_custom_img": False,
-                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
-                "fedex_custom_img": False,
-                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
-                "generic_custom_img": False,
-                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
-                "host": "imap.test.email",
+            "amazon_custom_img": True,
+            "amazon_custom_img_file": "images/test_amazon_only.jpg",
+            "ups_custom_img": False,
+            "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+            "walmart_custom_img": False,
+            "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+            "fedex_custom_img": False,
+            "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+            "generic_custom_img": False,
+            "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+            "host": "imap.test.email",
             "port": 993,
             "username": "test@test.email",
             "password": "notarealpassword",
@@ -5308,7 +5308,7 @@ async def test_reconfig_amazon_error(
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], input_1
-    )
+        )
 
     assert result["type"] == "form"
     assert result["step_id"] == "reconfigure"
@@ -5762,6 +5762,70 @@ async def test_generic_custom_image_in_config_flow(hass: HomeAssistant):
             os.unlink(temp_file_path)
 
 
+async def test_migration_to_version_12(hass: HomeAssistant):
+    """Test migration to version 12 adds new Walmart and Generic camera fields."""
+    # Create a mock config entry with version 11
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="imap.test.email",
+        data={
+            "host": "imap.test.email",
+            "port": "993",
+            "username": "test@test.email",
+            "password": "notarealpassword",
+            "imap_security": "SSL",
+            "verify_ssl": False,
+            "allow_external": False,
+            "custom_img": False,
+            "amazon_custom_img": False,
+            "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+            "ups_custom_img": False,
+            "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+            "folder": '"INBOX"',
+            "generate_grid": False,
+            "generate_mp4": False,
+            "resources": ["usps_mail"],
+            "storage": "custom_components/mail_and_packages/images/",
+        },
+        version=11,
+    )
+
+    entry.add_to_hass(hass)
+
+    # Set up the integration (this will trigger migration)
+    with patch(
+        "custom_components.mail_and_packages.helpers._test_login", return_value=True
+    ):
+        await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    # Verify version was updated (will go to 13, but we're testing that version 12 fields were added)
+    assert entry.version == 13
+
+    # Verify new Walmart camera fields were added with defaults
+    assert CONF_WALMART_CUSTOM_IMG in entry.data
+    assert entry.data[CONF_WALMART_CUSTOM_IMG] is False
+    assert CONF_WALMART_CUSTOM_IMG_FILE in entry.data
+    assert (
+        entry.data[CONF_WALMART_CUSTOM_IMG_FILE]
+        == "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
+    )
+
+    # Verify new Generic camera fields were added with defaults
+    assert CONF_GENERIC_CUSTOM_IMG in entry.data
+    assert entry.data[CONF_GENERIC_CUSTOM_IMG] is False
+    assert CONF_GENERIC_CUSTOM_IMG_FILE in entry.data
+    assert (
+        entry.data[CONF_GENERIC_CUSTOM_IMG_FILE]
+        == "custom_components/mail_and_packages/no_deliveries_generic.jpg"
+    )
+
+    # Verify existing fields were preserved
+    assert entry.data["host"] == "imap.test.email"
+    assert entry.data["amazon_custom_img"] is False
+    assert entry.data["ups_custom_img"] is False
+
+
 async def test_migration_to_version_13(hass: HomeAssistant):
     """Test migration to version 13 adds new generic camera fields."""
     # Create a mock config entry with version 11
@@ -5835,7 +5899,7 @@ async def test_migration_to_version_13(hass: HomeAssistant):
             "amazon_custom_img": False,
             "ups_custom_img": False,
             "walmart_custom_img": False,
-                "fedex_custom_img": False,
+            "fedex_custom_img": False,
             "generic_custom_img": False,
             "folder": '"INBOX"',
             "generate_grid": False,
