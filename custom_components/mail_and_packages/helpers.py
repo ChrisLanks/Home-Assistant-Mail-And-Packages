@@ -1648,10 +1648,6 @@ def get_count(
             except Exception as err:
                 _LOGGER.error("Error attempting to copy image: %s", str(err))
 
-        # Note: Coordinator data is updated immediately when image is saved (above)
-        # This section is kept for backward compatibility but shouldn't be needed
-        # since we set data[image_attr] = image_name directly after successful extraction
-
     # Derive tracking sensor key (e.g., "ups_delivered" -> "ups_tracking")
     tracking_sensor_key = f"{'_'.join(sensor_type.split('_')[:-1])}_tracking"
     if (
@@ -2833,13 +2829,17 @@ async def generate_delivery_gif(delivery_images: list, gif_path: str) -> bool:
     """
     try:
         # Open all images
-        images = [Image.open(img_path) for img_path in delivery_images]
+        corrected_images = []
+        for img_path in delivery_images:
+            img = Image.open(img_path)
+            img = ImageOps.exif_transpose(img)  # auto-rotates according to EXIF
+            corrected_images.append(img)
 
         # Create animated GIF (3 seconds per image)
-        images[0].save(
+        corrected_images[0].save(
             gif_path,
             format="GIF",
-            append_images=images[1:],
+            append_images=corrected_images[1:],
             save_all=True,
             duration=3000,  # 3 seconds per image
             loop=0,  # Infinite loop
