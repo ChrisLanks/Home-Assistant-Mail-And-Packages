@@ -411,8 +411,8 @@ def image_file_name(
 
     Returns filename
     """
-    _LOGGER.debug(
-        "image_file_name called - amazon: %s, ups: %s, walmart: %s, fedex: %s",
+    _LOGGER.info(
+        "=== image_file_name CALLED === - amazon: %s, ups: %s, walmart: %s, fedex: %s",
         amazon,
         ups,
         walmart,
@@ -524,6 +524,9 @@ def image_file_name(
     # If we find no images in the image directory generate a new filename
     if image_name in mail_none:
         image_name = f"{str(uuid.uuid4())}{ext}"
+        _LOGGER.info("=== image_file_name GENERATED NEW UUID: %s ===", image_name)
+    else:
+        _LOGGER.info("=== image_file_name USING EXISTING: %s ===", image_name)
     _LOGGER.debug("Image Name: %s", image_name)
 
     # Insert place holder image
@@ -767,12 +770,22 @@ def selectfolder(account: Type[imaplib.IMAP4_SSL], folder: str) -> bool:
     return True
 
 
+def get_today() -> datetime.date:
+    """Get today's date using system local timezone (Home Assistant's timezone).
+
+    Returns date object using the system's local timezone.
+    """
+    # For testing, set the date you wish here
+    return datetime.date.today()
+    #return datetime.date.today() - datetime.timedelta(days=1)
+
+
 def get_formatted_date() -> str:
     """Return today in specific format.
 
     Returns current timestamp as string
     """
-    today = datetime.datetime.today().strftime("%d-%b-%Y")
+    today = get_today().strftime("%d-%b-%Y")
     #
     # for testing
     # today = "11-Jan-2021"
@@ -1228,37 +1241,64 @@ def cleanup_images(path: str, image: Optional[str] = None) -> None:
 
     Only supose to delete .gif, .mp4, and .jpg files
     """
+    _LOGGER.warning("=== cleanup_images CALLED === path: %s, image: %s", path, image)
+
     if isinstance(path, tuple):
         path = path[0]
         image = path[1]
     if image is not None:
+        full_path = path + image
+        _LOGGER.warning("cleanup_images - Removing specific file: %s", full_path)
         try:
-            os.remove(path + image)
+            if os.path.exists(full_path):
+                os.remove(full_path)
+                _LOGGER.warning("cleanup_images - Successfully removed: %s", full_path)
+            else:
+                _LOGGER.warning("cleanup_images - File does not exist: %s", full_path)
         except Exception as err:
             _LOGGER.error("Error attempting to remove image: %s", str(err))
         return
 
     # Only clean up if directory exists
     if not os.path.isdir(path):
+        _LOGGER.warning("cleanup_images - Directory does not exist: %s", path)
         return
 
     try:
-        for file in os.listdir(path):
+        files_before = os.listdir(path)
+        _LOGGER.warning(
+            "cleanup_images - Files in directory BEFORE cleanup: %s", files_before
+        )
+        for file in files_before:
             if (
                 file.endswith(".gif")
                 or file.endswith(".mp4")
                 or file.endswith(".jpg")
                 or file.endswith(".png")
             ):
+                full_path = path + file
+                _LOGGER.warning("cleanup_images - Removing file: %s", full_path)
                 try:
-                    os.remove(path + file)
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+                        _LOGGER.warning(
+                            "cleanup_images - Successfully removed: %s", full_path
+                        )
+                    else:
+                        _LOGGER.warning(
+                            "cleanup_images - File does not exist: %s", full_path
+                        )
                 except Exception as err:
                     _LOGGER.error(
                         "Error attempting to remove found image: %s", str(err)
                     )
+        files_after = os.listdir(path) if os.path.isdir(path) else []
+        _LOGGER.warning(
+            "cleanup_images - Files in directory AFTER cleanup: %s", files_after
+        )
     except FileNotFoundError:
         # Directory was removed between check and listdir
-        pass
+        _LOGGER.warning("cleanup_images - Directory removed during cleanup: %s", path)
     except Exception as err:
         _LOGGER.error("Error listing directory for cleanup: %s", str(err))
 
@@ -1329,7 +1369,6 @@ def get_count(
     # Setup image extraction if this is a generic delivery sensor
     image_attr = None
     image_name = None
-    shipper_path = None
     no_delivery_image_file = None
     extraction_config = {}
     new_image_saved = False
@@ -1363,12 +1402,38 @@ def get_count(
         image_name = (
             data.get(image_attr, default_image_name) if data else default_image_name
         )
-        shipper_path = f"{image_path}{shipper_name}/"
+        _LOGGER.info(
+            (
+                "%s - get_count: image_name from coordinator data: %s "
+                "(image_attr: %s, data has key: %s)"
+            ),
+            shipper_name,
+            image_name,
+            image_attr,
+            image_attr in data if data else False,
+        )
+        # Ensure image_path ends with / but avoid double slashes
+        if image_path is None:
+            _LOGGER.error(
+                "get_count: image_path is None for sensor %s, cannot extract images",
+                sensor_type,
+            )
+            result[ATTR_COUNT] = count
+            result[ATTR_TRACKING] = ""
+            return result
+        normalized_image_path = image_path.rstrip("/") + "/"
+        absolute_image_path = normalized_image_path
+        absolute_shipper_path = f"{normalized_image_path}{shipper_name}/"
+        _LOGGER.debug(
+            "Setting Shipper paths to absolute_image_path:(%s) and absolute_shipper_path:(%s)",
+            absolute_image_path,
+            absolute_shipper_path,
+        )
 
-        # Create directory if needed
-        if not os.path.isdir(shipper_path):
+        # Create directory if needed (use absolute path)
+        if not os.path.isdir(absolute_shipper_path):
             try:
-                os.makedirs(shipper_path)
+                os.makedirs(absolute_shipper_path)
             except Exception as err:
                 _LOGGER.critical("Error creating directory: %s", str(err))
                 result[ATTR_COUNT] = count
@@ -1391,7 +1456,11 @@ def get_count(
         (server_response, email_data) = email_search(
             account, email_addresses, today, subject
         )
-        if server_response == "OK" and email_data[0] is not None:
+        if (
+            server_response == "OK"
+            and email_data[0] is not None
+            and email_data[0] != b""
+        ):
             # Get email IDs for this subject search
             email_ids = email_data[0].split()
             # Track unique email IDs to avoid double counting when multiple subjects match
@@ -1432,17 +1501,97 @@ def get_count(
                     msg = email_fetch(account, email_id, "(RFC822)")[1]
                     for response_part in msg:
                         if isinstance(response_part, tuple):
-                            sdata = response_part[1].decode("utf-8", "ignore")
-                            if _generic_delivery_image_extraction(
-                                sdata,
-                                image_path,
+                            # Pass raw bytes to preserve binary attachments
+                            email_bytes = response_part[1]
+                            _LOGGER.debug(
+                                "%s - Attempting image extraction for email %s, image_name: %s",
+                                shipper_name,
+                                email_id,
+                                image_name,
+                            )
+                            # Get the image
+                            extraction_result = _generic_delivery_image_extraction(
+                                email_bytes,
+                                absolute_image_path,  # Use absolute path for saving
                                 image_name,
                                 shipper_name,
                                 image_type,
                                 cid_name,
                                 attachment_filename_pattern,
-                            ):
+                            )
+                            _LOGGER.debug(
+                                "%s - Image extraction returned: %s",
+                                shipper_name,
+                                extraction_result,
+                            )
+                            expected_file_path = (
+                                f"{absolute_shipper_path}{image_name}"
+                            )
+
+                            # If we get a result and the file exists, then we can save the image
+                            if extraction_result and os.path.exists(expected_file_path):
+                                file_size = os.path.getsize(expected_file_path)
+                                _LOGGER.info(
+                                    "%s - File verified on disk: %s (%d bytes)",
+                                    shipper_name,
+                                    expected_file_path,
+                                    file_size,
+                                )
                                 new_image_saved = True
+                                # Update coordinator data immediately with the exact image name
+                                if data is not None:
+                                    old_value = data.get(image_attr, "NOT SET")
+                                    _LOGGER.info(
+                                        (
+                                            "%s - UPDATING COORDINATOR: Setting %s ="
+                                            "%s (was: %s) in coordinator data",
+                                        ),
+                                        shipper_name,
+                                        image_attr,
+                                        image_name,
+                                        old_value,
+                                    )
+                                    data[image_attr] = image_name
+                                    new_value = data.get(image_attr, "NOT SET")
+                                    _LOGGER.info(
+                                        "%s - Coordinator data updated. %s is now: %s",
+                                        shipper_name,
+                                        image_attr,
+                                        new_value,
+                                    )
+                                    # Log all image-related keys in coordinator
+                                    image_keys = [
+                                        k
+                                        for k in data.keys()
+                                        if "image" in k.lower()
+                                    ]
+                                    _LOGGER.info(
+                                        "%s - All image keys in coordinator: %s",
+                                        shipper_name,
+                                        {
+                                            k: data.get(k, "NOT SET")
+                                            for k in image_keys
+                                        },
+                                    )
+                                else:
+                                    _LOGGER.warning(
+                                        "%s - Coordinator data dict is None, cannot update %s",
+                                        shipper_name,
+                                        image_attr,
+                                    )
+                                _LOGGER.debug(
+                                    "%s - Image successfully saved and coordinator updated: %s",
+                                    shipper_name,
+                                    expected_file_path,
+                                )
+                            else:
+                                _LOGGER.debug(
+                                    (
+                                        "%s - Image extraction returned False"
+                                        "(no image found in email)"
+                                    ),
+                                    shipper_name,
+                                )
 
             _LOGGER.debug(
                 "Search for (%s) with subject (%s) results: %s count: %s",
@@ -1482,30 +1631,26 @@ def get_count(
 
     # Handle generic delivery sensor post-processing
     if shipper_name:
-        # Clean up image directory (after processing to minimize interruption)
-        # Only clean up if directory exists
-        if os.path.isdir(shipper_path):
-            cleanup_images(shipper_path)
-
-        # If no emails found, set default image
-        if count == 0 and no_delivery_image_file:
+        # If no emails found AND no image was saved, set default image
+        # Don't overwrite extracted delivery images with default image
+        if count == 0 and not new_image_saved and no_delivery_image_file:
+            # Clean up image directory before setting default (use absolute path)
+            # Only clean up if directory exists
+            if os.path.isdir(absolute_shipper_path):
+                cleanup_images(absolute_shipper_path)
             try:
-                # Ensure directory exists before copying
-                if not os.path.isdir(shipper_path):
-                    os.makedirs(shipper_path, exist_ok=True)
-                copyfile(no_delivery_image_file, shipper_path + image_name)
+                # Ensure directory exists before copying (use absolute path)
+                if not os.path.isdir(absolute_shipper_path):
+                    os.makedirs(absolute_shipper_path, exist_ok=True)
+                copyfile(no_delivery_image_file, absolute_shipper_path + image_name)
                 if data is not None:
                     data[image_attr] = image_name
             except Exception as err:
                 _LOGGER.error("Error attempting to copy image: %s", str(err))
 
-        # Update coordinator data if new image was saved
-        if new_image_saved and data is not None and os.path.isdir(shipper_path):
-            for file in os.listdir(shipper_path):
-                # Check for common image extensions
-                if file.endswith((".jpg", ".jpeg", ".png", ".gif")):
-                    data[image_attr] = file
-                    break
+        # Note: Coordinator data is updated immediately when image is saved (above)
+        # This section is kept for backward compatibility but shouldn't be needed
+        # since we set data[image_attr] = image_name directly after successful extraction
 
     # Derive tracking sensor key (e.g., "ups_delivered" -> "ups_tracking")
     tracking_sensor_key = f"{'_'.join(sensor_type.split('_')[:-1])}_tracking"
@@ -1526,7 +1671,15 @@ def get_count(
 
     result[ATTR_TRACKING] = tracking
 
+    # Always ensure ATTR_COUNT is set before returning
     result[ATTR_COUNT] = count
+    # Safety check: ensure result always has ATTR_COUNT
+    if ATTR_COUNT not in result:
+        _LOGGER.error(
+            "get_count: ATTR_COUNT not set for sensor %s, defaulting to 0",
+            sensor_type,
+        )
+        result[ATTR_COUNT] = 0
     return result
 
 
@@ -1664,7 +1817,7 @@ def _generic_delivery_image_extraction(
     """Extract delivery photos from email.
 
     Args:
-        sdata: Email content as string
+        sdata: Email content as bytes or string
         image_path: Base path for images
         image_name: Name for the image file
         shipper_name: Name of the shipper (e.g., "ups", "walmart", "fedex")
@@ -1676,9 +1829,17 @@ def _generic_delivery_image_extraction(
         True if image was saved, False otherwise
     """
     _LOGGER.debug("Attempting to extract %s delivery photo", shipper_name)
+    _LOGGER.debug("%s - image_path parameter: %s", shipper_name, image_path)
 
-    msg = email.message_from_string(sdata)
-    shipper_path = f"{image_path}{shipper_name}/"
+    # Handle both bytes and string input
+    if isinstance(sdata, bytes):
+        msg = email.message_from_bytes(sdata)
+    else:
+        msg = email.message_from_string(sdata)
+    # Normalize image_path to avoid double slashes (same as in get_count)
+    normalized_image_path = image_path.rstrip("/") + "/"
+    shipper_path = f"{normalized_image_path}{shipper_name}/"
+    _LOGGER.debug("%s - Constructed shipper_path: %s", shipper_name, shipper_path)
     content_type = f"image/{image_type}"
     base64_pattern = rf"data:image/{image_type};base64,([A-Za-z0-9+/=\s]+)"
 
@@ -1695,20 +1856,74 @@ def _generic_delivery_image_extraction(
     # Second pass: look for HTML content with CID references or base64
     for part in msg.walk():
         if part.get_content_type() == "text/html":
-            part_content = part.get_payload(decode=True).decode("utf-8", "ignore")
+            part_payload = part.get_payload(decode=True)
+            if isinstance(part_payload, bytes):
+                part_content = part_payload.decode("utf-8", "ignore")
+            else:
+                part_content = str(part_payload)
 
             # Check for CID reference
             if cid_name and cid_name in part_content:
+                _LOGGER.debug(
+                    "%s - Found CID reference '%s' in email content",
+                    shipper_name,
+                    cid_name,
+                )
                 if cid_name in cid_images:
+                    _LOGGER.debug(
+                        "%s - Found CID image data for '%s' (%d bytes)",
+                        shipper_name,
+                        cid_name,
+                        len(cid_images[cid_name]) if cid_images[cid_name] else 0,
+                    )
                     try:
-                        with open(shipper_path + image_name, "wb") as the_file:
-                            the_file.write(cid_images[cid_name])
+                        full_path = shipper_path + image_name
                         _LOGGER.debug(
-                            "%s delivery photo saved from CID: %s",
+                            "%s - Writing CID image to disk: %s",
                             shipper_name,
-                            image_name,
+                            full_path,
                         )
-                        return True
+                        # Ensure directory exists
+                        if not os.path.isdir(shipper_path):
+                            _LOGGER.debug(
+                                "%s - Creating directory: %s",
+                                shipper_name,
+                                shipper_path,
+                            )
+                            os.makedirs(shipper_path, exist_ok=True)
+                        image_data = cid_images[cid_name]
+                        _LOGGER.debug(
+                            "%s - Writing %d bytes to file: %s",
+                            shipper_name,
+                            len(image_data) if image_data else 0,
+                            full_path,
+                        )
+                        with open(full_path, "wb") as the_file:
+                            the_file.write(image_data)
+                        _LOGGER.debug(
+                            "%s - File write completed, verifying file exists...",
+                            shipper_name,
+                        )
+                        # Verify file was actually written
+                        if os.path.exists(full_path):
+                            file_size = os.path.getsize(full_path)
+                            _LOGGER.info(
+                                "%s - SUCCESS: CID image written to disk: %s (%d bytes)",
+                                shipper_name,
+                                full_path,
+                                file_size,
+                            )
+                            return True
+
+                        _LOGGER.error(
+                            (
+                                "%s - ERROR:"
+                                "CID file write reported success but file doesn't exist: %s"
+                            ),
+                            shipper_name,
+                            full_path,
+                        )
+                        return False
                     except Exception as err:
                         _LOGGER.error(
                             "Error saving %s delivery photo from CID: %s",
@@ -1720,16 +1935,58 @@ def _generic_delivery_image_extraction(
             # Look for base64 encoded images
             matches = re.findall(base64_pattern, part_content)
             if matches:
+                _LOGGER.debug(
+                    "%s - Found %d base64 image(s) in email content",
+                    shipper_name,
+                    len(matches),
+                )
                 try:
                     base64_data = matches[0].replace(" ", "").replace("=3D", "=")
-                    with open(shipper_path + image_name, "wb") as the_file:
-                        the_file.write(base64.b64decode(base64_data))
                     _LOGGER.debug(
-                        "%s delivery photo saved from base64: %s",
+                        "%s - Decoding base64 image data (%d chars)",
                         shipper_name,
-                        image_name,
+                        len(base64_data),
                     )
-                    return True
+                    full_path = shipper_path + image_name
+                    _LOGGER.debug(
+                        "%s - Writing base64 image to disk: %s", shipper_name, full_path
+                    )
+                    # Ensure directory exists
+                    if not os.path.isdir(shipper_path):
+                        _LOGGER.debug(
+                            "%s - Creating directory: %s", shipper_name, shipper_path
+                        )
+                        os.makedirs(shipper_path, exist_ok=True)
+                    image_data = base64.b64decode(base64_data)
+                    _LOGGER.debug(
+                        "%s - Writing %d bytes to file: %s",
+                        shipper_name,
+                        len(image_data) if image_data else 0,
+                        full_path,
+                    )
+                    with open(full_path, "wb") as the_file:
+                        the_file.write(image_data)
+                    _LOGGER.debug(
+                        "%s - File write completed, verifying file exists...",
+                        shipper_name,
+                    )
+                    # Verify file was actually written
+                    if os.path.exists(full_path):
+                        file_size = os.path.getsize(full_path)
+                        _LOGGER.info(
+                            "%s - SUCCESS: Base64 image written to disk: %s (%d bytes)",
+                            shipper_name,
+                            full_path,
+                            file_size,
+                        )
+                        return True
+
+                    _LOGGER.error(
+                        "%s - ERROR: Base64 file write reported success but file doesn't exist: %s",
+                        shipper_name,
+                        full_path,
+                    )
+                    return False
                 except Exception as err:
                     _LOGGER.error(
                         "Error saving %s delivery photo from base64: %s",
@@ -1743,20 +2000,82 @@ def _generic_delivery_image_extraction(
         if part.get_content_type() == content_type:
             filename = part.get_filename()
             if filename:
+                _LOGGER.debug(
+                    "%s - Found attachment: %s (content_type: %s)",
+                    shipper_name,
+                    filename,
+                    part.get_content_type(),
+                )
                 # Check filename pattern if provided, otherwise accept any
                 if attachment_filename_pattern:
                     if attachment_filename_pattern.lower() not in filename.lower():
+                        _LOGGER.debug(
+                            "%s - Attachment filename '%s' doesn't match pattern '%s', skipping",
+                            shipper_name,
+                            filename,
+                            attachment_filename_pattern,
+                        )
                         continue
-                try:
-                    with open(shipper_path + image_name, "wb") as the_file:
-                        the_file.write(part.get_payload(decode=True))
                     _LOGGER.debug(
-                        "%s delivery photo saved: %s", shipper_name, image_name
+                        "%s - Attachment filename '%s' matches pattern '%s'",
+                        shipper_name,
+                        filename,
+                        attachment_filename_pattern,
                     )
-                    return True
+                try:
+                    full_path = shipper_path + image_name
+                    _LOGGER.debug(
+                        "%s - Writing attachment image to disk: %s",
+                        shipper_name,
+                        full_path,
+                    )
+                    # Ensure directory exists
+                    if not os.path.isdir(shipper_path):
+                        _LOGGER.debug(
+                            "%s - Creating directory: %s", shipper_name, shipper_path
+                        )
+                        os.makedirs(shipper_path, exist_ok=True)
+                    image_data = part.get_payload(decode=True)
+                    _LOGGER.debug(
+                        "%s - Writing %d bytes to file: %s",
+                        shipper_name,
+                        len(image_data) if image_data else 0,
+                        full_path,
+                    )
+                    with open(full_path, "wb") as the_file:
+                        the_file.write(image_data)
+                    _LOGGER.debug(
+                        "%s - File write completed, verifying file exists...",
+                        shipper_name,
+                    )
+                    # Verify file was actually written
+                    if os.path.exists(full_path):
+                        file_size = os.path.getsize(full_path)
+                        _LOGGER.info(
+                            (
+                                "%s - SUCCESS: Attachment image written to disk:"
+                                "%s (%d bytes)"
+                            ),
+                            shipper_name,
+                            full_path,
+                            file_size,
+                        )
+                        return True
+                    _LOGGER.error(
+                        (
+                            "%s - ERROR:"
+                            "Attachment file write reported success but file doesn't exist: %s"
+                        ),
+                        shipper_name,
+                        full_path,
+                    )
+                    return False
                 except Exception as err:
                     _LOGGER.error(
-                        "Error saving %s delivery photo: %s", shipper_name, str(err)
+                        "Error saving %s delivery photo to %s: %s",
+                        shipper_name,
+                        shipper_path + image_name,
+                        str(err),
                     )
                     return False
 
@@ -2161,7 +2480,7 @@ def get_items(
     _LOGGER.debug("Attempting to find Amazon email with item list ...")
 
     # Limit to past X days
-    past_date = datetime.date.today() - datetime.timedelta(days=days)
+    past_date = get_today() - datetime.timedelta(days=days)
     tfmt = past_date.strftime("%d-%b-%Y")
     deliveries_today = []
     amazon_delivered = []
@@ -2244,7 +2563,7 @@ def get_items(
                                 )
                     _LOGGER.debug("Email from date: %s", str(email_date))
 
-                    today_date = datetime.date.today()
+                    today_date = get_today()
 
                     # Skip 'arriving' emails that are not from today
                     # if param and "arriving" in param.lower():

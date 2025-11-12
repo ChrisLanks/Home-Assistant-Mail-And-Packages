@@ -349,13 +349,131 @@ class MailCam(CoordinatorEntity, Camera):
                     required_keys = set([image_attr, ATTR_IMAGE_PATH])
                     if required_keys.issubset(self.coordinator.data.keys()):
                         image = self.coordinator.data[image_attr]
-                        path = f"{self.coordinator.data[ATTR_IMAGE_PATH]}{base_name}/"
-                        file_path = f"{self.hass.config.path()}/{path}{image}"
-                        _LOGGER.debug(
-                            "%s camera - using coordinator data: %s",
-                            self._type,
-                            file_path,
+                        # Normalize image_path to avoid double slashes
+                        image_path = (
+                            self.coordinator.data[ATTR_IMAGE_PATH].rstrip("/") + "/"
                         )
+                        path = f"{image_path}{base_name}/"
+                        coordinator_file_path = (
+                            f"{self.hass.config.path()}/{path}{image}"
+                        )
+                        _LOGGER.info(
+                            "=== %s CAMERA UPDATE === coordinator %s = '%s'",
+                            self._type,
+                            image_attr,
+                            image,
+                        )
+                        _LOGGER.info(
+                            "%s camera - checking for file: %s",
+                            self._type,
+                            coordinator_file_path,
+                        )
+                        # Log all image-related keys in coordinator for this camera
+                        all_image_keys = {
+                            k: self.coordinator.data.get(k, "NOT SET")
+                            for k in self.coordinator.data.keys()
+                            if "image" in k.lower()
+                        }
+                        _LOGGER.info(
+                            "%s camera - All image keys in coordinator: %s",
+                            self._type,
+                            all_image_keys,
+                        )
+                        # Verify file exists before using it, fall back to default if not
+                        if os.path.exists(coordinator_file_path) and os.access(
+                            coordinator_file_path, os.R_OK
+                        ):
+                            file_path = coordinator_file_path
+                            _LOGGER.debug(
+                                "%s camera - found coordinator file: %s",
+                                self._type,
+                                file_path,
+                            )
+                        else:
+                            _LOGGER.warning(
+                                "%s camera - coordinator file not found or not readable: %s (exists: %s, readable: %s)",
+                                self._type,
+                                coordinator_file_path,
+                                os.path.exists(coordinator_file_path),
+                                (
+                                    os.access(coordinator_file_path, os.R_OK)
+                                    if os.path.exists(coordinator_file_path)
+                                    else False
+                                ),
+                            )
+                            # List directory contents for debugging
+                            path_dir = os.path.dirname(coordinator_file_path)
+                            _LOGGER.warning(
+                                "%s camera - Directory path: %s (exists: %s)",
+                                self._type,
+                                path_dir,
+                                os.path.exists(path_dir),
+                            )
+                            if os.path.exists(path_dir):
+                                try:
+                                    files_in_dir = os.listdir(path_dir)
+                                    _LOGGER.warning(
+                                        "%s camera - directory exists, files found: %s",
+                                        self._type,
+                                        files_in_dir,
+                                    )
+                                    _LOGGER.warning(
+                                        "%s camera - Expected file '%s' in directory: %s",
+                                        self._type,
+                                        image,
+                                        (
+                                            image in files_in_dir
+                                            if files_in_dir
+                                            else False
+                                        ),
+                                    )
+                                    # Try to find any image file in the directory if the expected one isn't there
+                                    # Prefer the most recent file (by modification time) to show latest delivery
+                                    image_files = []
+                                    for file in files_in_dir:
+                                        if file.endswith(
+                                            (".jpg", ".jpeg", ".png", ".gif")
+                                        ):
+                                            potential_file = os.path.join(
+                                                path_dir, file
+                                            )
+                                            if os.path.exists(
+                                                potential_file
+                                            ) and os.access(potential_file, os.R_OK):
+                                                # Skip "no_deliveries" default images
+                                                if "no_deliveries" not in file:
+                                                    image_files.append(
+                                                        (
+                                                            potential_file,
+                                                            os.path.getmtime(
+                                                                potential_file
+                                                            ),
+                                                        )
+                                                    )
+                                    if image_files:
+                                        # Sort by modification time (most recent first)
+                                        image_files.sort(
+                                            key=lambda x: x[1], reverse=True
+                                        )
+                                        file_path = image_files[0][0]
+                                        _LOGGER.debug(
+                                            "%s camera - found alternative image file (most recent): %s",
+                                            self._type,
+                                            file_path,
+                                        )
+                                except Exception as err:
+                                    _LOGGER.debug(
+                                        "%s camera - error listing directory %s: %s",
+                                        self._type,
+                                        path_dir,
+                                        err,
+                                    )
+                            else:
+                                _LOGGER.warning(
+                                    "%s camera - directory does not exist: %s",
+                                    self._type,
+                                    path_dir,
+                                )
 
         self.check_file_path_access(file_path)
         self._file_path = file_path
@@ -450,6 +568,18 @@ class MailCam(CoordinatorEntity, Camera):
         False if entity pushes its state to HA.
         """
         return True
+
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        _LOGGER.debug(
+            "%s camera - coordinator update received, updating file path",
+            self._type,
+        )
+        # Call parent to handle coordinator update
+        super()._handle_coordinator_update()
+        # Schedule the file path update when coordinator data changes
+        # update_file_path() will call schedule_update_ha_state() at the end
+        self.hass.async_create_task(self.update_file_path())
 
     async def async_update(self):
         """Update camera entity and refresh attributes."""

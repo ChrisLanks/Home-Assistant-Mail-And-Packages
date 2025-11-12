@@ -366,8 +366,14 @@ class MailDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.debug(
                     "%s image from coordinator data: %s", base_name.title(), image
                 )
-                path = f"{default_image_path(self.hass, self.config)}/{base_name}/"
-                delivery_image = f"{path}{image}"
+                # Normalize path to avoid double slashes
+                image_path = (
+                    default_image_path(self.hass, self.config).rstrip("/") + "/"
+                )
+                path = f"{image_path}{base_name}/"
+                # Use absolute path for file existence check
+                delivery_image_relative = f"{path}{image}"
+                delivery_image = f"{self.hass.config.path()}/{delivery_image_relative}"
                 _LOGGER.debug(
                     "Full %s image path: %s", base_name.title(), delivery_image
                 )
