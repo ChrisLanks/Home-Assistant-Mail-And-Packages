@@ -623,15 +623,35 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     sensor in self._data[CONF_RESOURCES] for sensor in AMAZON_SENSORS
                 ):
                     return await self.async_step_config_amazon()
-                if (
+                has_custom_image = (
                     self._data.get(CONF_CUSTOM_IMG)
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
                     or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
-                ):
+                )
+                if has_custom_image:
                     return await self.async_step_config_3()
+                # Ensure all custom image file fields are present with defaults
+                if CONF_AMAZON_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_AMAZON_CUSTOM_IMG_FILE] = (
+                        DEFAULT_AMAZON_CUSTOM_IMG_FILE
+                    )
+                if CONF_UPS_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_UPS_CUSTOM_IMG_FILE] = DEFAULT_UPS_CUSTOM_IMG_FILE
+                if CONF_WALMART_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_WALMART_CUSTOM_IMG_FILE] = (
+                        DEFAULT_WALMART_CUSTOM_IMG_FILE
+                    )
+                if CONF_FEDEX_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_FEDEX_CUSTOM_IMG_FILE] = (
+                        DEFAULT_FEDEX_CUSTOM_IMG_FILE
+                    )
+                if CONF_GENERIC_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_GENERIC_CUSTOM_IMG_FILE] = (
+                        DEFAULT_GENERIC_CUSTOM_IMG_FILE
+                    )
                 return self.async_create_entry(
                     title=self._data[CONF_HOST], data=self._data
                 )
@@ -773,6 +793,25 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             self._data.update(user_input)
             self._errors, user_input = await _validate_user_input(self._data)
             if len(self._errors) == 0:
+                # Ensure all custom image file fields are present with defaults
+                if CONF_AMAZON_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_AMAZON_CUSTOM_IMG_FILE] = (
+                        DEFAULT_AMAZON_CUSTOM_IMG_FILE
+                    )
+                if CONF_UPS_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_UPS_CUSTOM_IMG_FILE] = DEFAULT_UPS_CUSTOM_IMG_FILE
+                if CONF_WALMART_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_WALMART_CUSTOM_IMG_FILE] = (
+                        DEFAULT_WALMART_CUSTOM_IMG_FILE
+                    )
+                if CONF_FEDEX_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_FEDEX_CUSTOM_IMG_FILE] = (
+                        DEFAULT_FEDEX_CUSTOM_IMG_FILE
+                    )
+                if CONF_GENERIC_CUSTOM_IMG_FILE not in self._data:
+                    self._data[CONF_GENERIC_CUSTOM_IMG_FILE] = (
+                        DEFAULT_GENERIC_CUSTOM_IMG_FILE
+                    )
                 return self.async_create_entry(
                     title=self._data[CONF_HOST], data=self._data
                 )
@@ -841,14 +880,15 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     sensor in self._data[CONF_RESOURCES] for sensor in AMAZON_SENSORS
                 ):
                     return await self.async_step_reconfig_amazon()
-                if (
+                has_custom_image = (
                     self._data.get(CONF_CUSTOM_IMG)
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
                     or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
-                ):
+                )
+                if has_custom_image:
                     return await self.async_step_reconfig_3()
 
                 return await self.async_step_reconfig_storage()
@@ -905,14 +945,15 @@ class MailAndPackagesFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             self._data.update(user_input)
             self._errors, user_input = await _validate_user_input(self._data)
             if len(self._errors) == 0:
-                if (
+                has_custom_image = (
                     self._data.get(CONF_CUSTOM_IMG)
                     or self._data.get(CONF_AMAZON_CUSTOM_IMG)
                     or self._data.get(CONF_UPS_CUSTOM_IMG)
                     or self._data.get(CONF_WALMART_CUSTOM_IMG)
                     or self._data.get(CONF_FEDEX_CUSTOM_IMG)
                     or self._data.get(CONF_GENERIC_CUSTOM_IMG)
-                ):
+                )
+                if has_custom_image:
                     return await self.async_step_reconfig_3()
 
                 return await self.async_step_reconfig_storage()

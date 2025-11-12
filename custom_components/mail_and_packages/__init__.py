@@ -16,16 +16,26 @@ from . import const
 from .const import (
     ATTR_IMAGE_NAME,
     ATTR_IMAGE_PATH,
+    CONF_AMAZON_CUSTOM_IMG,
+    CONF_AMAZON_CUSTOM_IMG_FILE,
     CONF_AMAZON_DAYS,
     CONF_AMAZON_DOMAIN,
     CONF_AMAZON_FWDS,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
+    CONF_GENERIC_CUSTOM_IMG,
+    CONF_GENERIC_CUSTOM_IMG_FILE,
     CONF_IMAGE_SECURITY,
     CONF_IMAP_SECURITY,
     CONF_IMAP_TIMEOUT,
     CONF_PATH,
     CONF_SCAN_INTERVAL,
     CONF_STORAGE,
+    CONF_UPS_CUSTOM_IMG,
+    CONF_UPS_CUSTOM_IMG_FILE,
     CONF_VERIFY_SSL,
+    CONF_WALMART_CUSTOM_IMG,
+    CONF_WALMART_CUSTOM_IMG_FILE,
     CONFIG_VER,
     COORDINATOR,
     DEFAULT_AMAZON_DAYS,
@@ -233,6 +243,29 @@ async def async_migrate_entry(hass, config_entry):
                 "custom_components/mail_and_packages/no_deliveries_generic.jpg"
             )
 
+    # Ensure all custom image file fields are present (regardless of version)
+    # This handles cases where configs might be missing these fields
+    if CONF_AMAZON_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_AMAZON_CUSTOM_IMG_FILE] = (
+            "custom_components/mail_and_packages/no_deliveries_amazon.jpg"
+        )
+    if CONF_UPS_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_UPS_CUSTOM_IMG_FILE] = (
+            "custom_components/mail_and_packages/no_deliveries_ups.jpg"
+        )
+    if CONF_WALMART_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_WALMART_CUSTOM_IMG_FILE] = (
+            "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
+        )
+    if CONF_FEDEX_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_FEDEX_CUSTOM_IMG_FILE] = (
+            "custom_components/mail_and_packages/no_deliveries_fedex.jpg"
+        )
+    if CONF_GENERIC_CUSTOM_IMG_FILE not in updated_config:
+        updated_config[CONF_GENERIC_CUSTOM_IMG_FILE] = (
+            "custom_components/mail_and_packages/no_deliveries_generic.jpg"
+        )
+
     if CONF_PATH not in updated_config:
         updated_config[CONF_PATH] = "custom_components/mail_and_packages/images/"
 
@@ -307,7 +340,7 @@ class MailDataUpdateCoordinator(DataUpdateCoordinator):
         # Derive camera list dynamically from CAMERA_DATA, excluding usps_camera and generic_camera
         delivery_cameras = [
             camera_type.replace("_camera", "")
-            for camera_type in const.CAMERA_DATA.keys()
+            for camera_type in const.CAMERA_DATA
             if camera_type not in ("usps_camera", "generic_camera")
         ]
 

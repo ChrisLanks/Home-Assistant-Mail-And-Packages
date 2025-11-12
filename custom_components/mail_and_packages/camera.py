@@ -15,12 +15,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from . import const
 from .helpers import generate_delivery_gif
 from .const import (
-    ATTR_AMAZON_IMAGE,
     ATTR_IMAGE_NAME,
     ATTR_IMAGE_PATH,
-    ATTR_UPS_IMAGE,
-    ATTR_WALMART_IMAGE,
-    ATTR_FEDEX_IMAGE,
     CAMERA,
     CAMERA_DATA,
     CONF_CUSTOM_IMG,
@@ -97,6 +93,7 @@ class MailCam(CoordinatorEntity, Camera):
         Camera.__init__(self)
 
         self.hass = hass
+        self.config = config
         self._name = CAMERA_DATA[name][SENSOR_NAME]
         self._type = name
         self._host = config.data.get(CONF_HOST)

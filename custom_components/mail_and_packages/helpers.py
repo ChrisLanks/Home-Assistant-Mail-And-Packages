@@ -36,11 +36,7 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.util import ssl
 
-<<<<<<< HEAD
-
-=======
 from . import const
->>>>>>> 999a254 (simplify logic)
 from .const import (
     AMAZON_DELIEVERED_BY_OTHERS_SEARCH_TEXT,
     AMAZON_DELIVERED,
@@ -379,6 +375,8 @@ def copy_images(hass: HomeAssistant, config: ConfigEntry) -> None:
     paths.append(dst)
     paths.append(dst + "amazon/")
     paths.append(dst + "ups/")
+    paths.append(dst + "walmart/")
+    paths.append(dst + "fedex/")
 
     # Clean up the destination directory
     for path in paths:
@@ -502,9 +500,10 @@ def image_file_name(
     ext = ".jpg" if amazon or ups or walmart or fedex else ".gif"
 
     for file in os.listdir(path):
-        if file.endswith(".gif") or (
+        is_image_file = file.endswith(".gif") or (
             file.endswith(".jpg") and (amazon or ups or walmart or fedex)
-        ):
+        )
+        if is_image_file:
             try:
                 created = datetime.datetime.fromtimestamp(
                     os.path.getctime(os.path.join(path, file))
@@ -1239,17 +1238,29 @@ def cleanup_images(path: str, image: Optional[str] = None) -> None:
             _LOGGER.error("Error attempting to remove image: %s", str(err))
         return
 
-    for file in os.listdir(path):
-        if (
-            file.endswith(".gif")
-            or file.endswith(".mp4")
-            or file.endswith(".jpg")
-            or file.endswith(".png")
-        ):
-            try:
-                os.remove(path + file)
-            except Exception as err:
-                _LOGGER.error("Error attempting to remove found image: %s", str(err))
+    # Only clean up if directory exists
+    if not os.path.isdir(path):
+        return
+
+    try:
+        for file in os.listdir(path):
+            if (
+                file.endswith(".gif")
+                or file.endswith(".mp4")
+                or file.endswith(".jpg")
+                or file.endswith(".png")
+            ):
+                try:
+                    os.remove(path + file)
+                except Exception as err:
+                    _LOGGER.error(
+                        "Error attempting to remove found image: %s", str(err)
+                    )
+    except FileNotFoundError:
+        # Directory was removed between check and listdir
+        pass
+    except Exception as err:
+        _LOGGER.error("Error listing directory for cleanup: %s", str(err))
 
 
 def get_count(
@@ -1273,6 +1284,7 @@ def get_count(
     today = get_formatted_date()
     track = None
     found = []
+    unique_email_ids = set()  # Track unique email IDs to avoid double counting
 
     # Return Amazon delivered info
     if sensor_type == AMAZON_DELIVERED:
@@ -1289,135 +1301,6 @@ def get_count(
         result[ATTR_TRACKING] = ""
         return result
 
-<<<<<<< HEAD
-    # Return UPS delivered info
-    if sensor_type == "ups_delivered":
-        ups_image_name = (
-            data.get(ATTR_UPS_IMAGE, "ups_delivery.jpg") if data else "ups_delivery.jpg"
-        )
-        result[ATTR_COUNT] = _generic_delivery_search(
-            account,
-            image_path,
-            hass,
-            ups_image_name,
-            "ups",
-            "ups_delivered",
-            ATTR_UPS_IMAGE,
-            f"{os.path.dirname(__file__)}/no_deliveries_ups.jpg",
-            data,
-            image_type="jpeg",
-            cid_name="deliveryPhoto",
-            forwarded_emails=forwarded_emails,
-        )
-
-        # Extract tracking number if requested
-        if get_tracking_num:
-            # Search for UPS delivered emails to extract tracking numbers
-            (server_response, email_data) = email_search(
-                account,
-                SENSOR_DATA["ups_delivered"][ATTR_EMAIL],
-                today,
-                SENSOR_DATA["ups_delivered"][ATTR_SUBJECT][0],
-            )
-            if server_response == "OK" and email_data[0] is not None:
-                tracking = get_tracking(
-                    email_data[0], account, SENSOR_DATA["ups_tracking"][ATTR_PATTERN][0]
-                )
-                result[ATTR_TRACKING] = tracking
-            else:
-                result[ATTR_TRACKING] = []
-        else:
-            result[ATTR_TRACKING] = ""
-        return result
-
-    # Return Walmart delivered info
-    if sensor_type == "walmart_delivered":
-        walmart_image_name = (
-            data.get(ATTR_WALMART_IMAGE, "walmart_delivery.jpg")
-            if data
-            else "walmart_delivery.jpg"
-        )
-        result[ATTR_COUNT] = _generic_delivery_search(
-            account,
-            image_path,
-            hass,
-            walmart_image_name,
-            "walmart",
-            "walmart_delivered",
-            ATTR_WALMART_IMAGE,
-            f"{os.path.dirname(__file__)}/no_deliveries_walmart.jpg",
-            data,
-            image_type="png",
-            cid_name="deliveryProofLabel",
-        )
-
-        # Extract tracking number if requested
-        if get_tracking_num:
-            # Search for Walmart delivered emails to extract tracking numbers
-            (server_response, email_data) = email_search(
-                account,
-                SENSOR_DATA["walmart_delivered"][ATTR_EMAIL],
-                today,
-                SENSOR_DATA["walmart_delivered"][ATTR_SUBJECT][0],
-            )
-            if server_response == "OK" and email_data[0] is not None:
-                tracking = get_tracking(
-                    email_data[0],
-                    account,
-                    SENSOR_DATA["walmart_tracking"][ATTR_PATTERN][0],
-                )
-                result[ATTR_TRACKING] = tracking
-            else:
-                result[ATTR_TRACKING] = []
-        else:
-            result[ATTR_TRACKING] = ""
-        return result
-
-    # Return FedEx delivered info
-    if sensor_type == "fedex_delivered":
-        fedex_image_name = (
-            data.get(ATTR_FEDEX_IMAGE, "fedex_delivery.jpg")
-            if data
-            else "fedex_delivery.jpg"
-        )
-        result[ATTR_COUNT] = _generic_delivery_search(
-            account,
-            image_path,
-            hass,
-            fedex_image_name,
-            "fedex",
-            "fedex_delivered",
-            ATTR_FEDEX_IMAGE,
-            f"{os.path.dirname(__file__)}/no_deliveries_fedex.jpg",
-            data,
-            image_type="jpeg",
-            attachment_filename_pattern="delivery",
-        )
-
-        # Extract tracking number if requested
-        if get_tracking_num:
-            # Search for FedEx delivered emails to extract tracking numbers
-            (server_response, email_data) = email_search(
-                account,
-                SENSOR_DATA["fedex_delivered"][ATTR_EMAIL],
-                today,
-                SENSOR_DATA["fedex_delivered"][ATTR_SUBJECT][0],
-            )
-            if server_response == "OK" and email_data[0] is not None:
-                tracking = get_tracking(
-                    email_data[0],
-                    account,
-                    SENSOR_DATA["fedex_tracking"][ATTR_PATTERN][0],
-                )
-                result[ATTR_TRACKING] = tracking
-            else:
-                result[ATTR_TRACKING] = []
-        else:
-            result[ATTR_TRACKING] = ""
-        return result
-
-=======
->>>>>>> 999a254 (simplify logic)
     # Bail out if unknown sensor type
     if ATTR_EMAIL not in SENSOR_DATA[sensor_type]:
         _LOGGER.debug("Unknown sensor type: %s", str(sensor_type))
@@ -1425,25 +1308,18 @@ def get_count(
         result[ATTR_TRACKING] = ""
         return result
 
-<<<<<<< HEAD
     if forwarded_emails:
         email_addresses = forwarded_emails + SENSOR_DATA[sensor_type][ATTR_EMAIL]
     else:
         email_addresses = SENSOR_DATA[sensor_type][ATTR_EMAIL]
-
-    subjects = SENSOR_DATA[sensor_type][ATTR_SUBJECT]
-    for subject in subjects:
-        _LOGGER.debug(
-            "Attempting to find mail from (%s) with subject (%s)",
-            email_addresses,
-=======
     # Check if this is a generic delivery sensor with image extraction (UPS, Walmart, FedEx)
     # Derive shipper_name from sensor_type (e.g., "ups_delivered" -> "ups")
     shipper_name = None
     if sensor_type.endswith("_delivered"):
         potential_shipper = sensor_type.replace("_delivered", "")
         camera_key = f"{potential_shipper}_camera"
-        # Check if this shipper has a camera in CAMERA_DATA (excluding usps_camera and generic_camera)
+        # Check if this shipper has a camera in CAMERA_DATA
+        # (excluding usps_camera and generic_camera)
         if camera_key in CAMERA_DATA and camera_key not in (
             "usps_camera",
             "generic_camera",
@@ -1504,40 +1380,55 @@ def get_count(
 
     # Loop through all subjects (unified path for both generic delivery and normal sensors)
     subjects = sensor_data[ATTR_SUBJECT]
-    sensor_email = sensor_data[ATTR_EMAIL]
     is_delivered_sensor = sensor_type.endswith("_delivered")
     for subject in subjects:
         _LOGGER.debug(
             "Attempting to find mail from (%s) with subject (%s)",
-            sensor_email,
->>>>>>> 999a254 (simplify logic)
+            email_addresses,
             subject,
         )
 
         (server_response, email_data) = email_search(
-<<<<<<< HEAD
             account, email_addresses, today, subject
-=======
-            account, sensor_email, today, subject
->>>>>>> 999a254 (simplify logic)
         )
         if server_response == "OK" and email_data[0] is not None:
-            # Count emails using less intensive method (same for both paths)
-            if ATTR_BODY in sensor_data:
-                body_count = sensor_data.get(ATTR_BODY_COUNT, False)
-                _LOGGER.debug("Check body for mail count? %s", body_count)
-                count += find_text(
-                    email_data,
-                    account,
-                    sensor_data[ATTR_BODY],
-                    body_count,
+            # Get email IDs for this subject search
+            email_ids = email_data[0].split()
+            # Track unique email IDs to avoid double counting when multiple subjects match
+            new_email_ids = []
+            for email_id in email_ids:
+                email_id_str = (
+                    email_id.decode() if isinstance(email_id, bytes) else str(email_id)
                 )
-            else:
-                count += len(email_data[0].split())
+                if email_id_str not in unique_email_ids:
+                    unique_email_ids.add(email_id_str)
+                    new_email_ids.append(email_id)
+
+            # Only count new emails (not already counted from previous subject matches)
+            if new_email_ids:
+                # Count emails using less intensive method (same for both paths)
+                if ATTR_BODY in sensor_data:
+                    body_count = sensor_data.get(ATTR_BODY_COUNT, False)
+                    _LOGGER.debug("Check body for mail count? %s", body_count)
+                    # Create a mock email_data with only new email IDs
+                    new_email_data = (
+                        b" ".join(
+                            email_id.encode() if isinstance(email_id, str) else email_id
+                            for email_id in new_email_ids
+                        ),
+                    )
+                    count += find_text(
+                        new_email_data,
+                        account,
+                        sensor_data[ATTR_BODY],
+                        body_count,
+                    )
+                else:
+                    count += len(new_email_ids)
 
             # If generic delivery sensor, extract images from emails
             if shipper_name:
-                for email_id in email_data[0].split():
+                for email_id in new_email_ids:
                     msg = email_fetch(account, email_id, "(RFC822)")[1]
                     for response_part in msg:
                         if isinstance(response_part, tuple):
@@ -1555,11 +1446,7 @@ def get_count(
 
             _LOGGER.debug(
                 "Search for (%s) with subject (%s) results: %s count: %s",
-<<<<<<< HEAD
                 email_addresses,
-=======
-                sensor_email,
->>>>>>> 999a254 (simplify logic)
                 subject,
                 email_data[0],
                 count,
@@ -1569,11 +1456,14 @@ def get_count(
             # If sensor ends with "_delivered", check email content for "AMAZON". UPS,
             # USPS will say delivered for: "AMAZON" in their email. This is used to
             # fix in transit.
+            # Only check new emails to avoid double counting
             if (
                 is_delivered_sensor
                 and sensor_type != AMAZON_DELIVERED
                 and data is not None
+                and new_email_ids
             ):
+                # Use original email_data for Amazon check (all emails, not just new ones)
                 amazon_mentions = find_text(
                     email_data,
                     account,
@@ -1593,11 +1483,16 @@ def get_count(
     # Handle generic delivery sensor post-processing
     if shipper_name:
         # Clean up image directory (after processing to minimize interruption)
-        cleanup_images(shipper_path)
+        # Only clean up if directory exists
+        if os.path.isdir(shipper_path):
+            cleanup_images(shipper_path)
 
         # If no emails found, set default image
         if count == 0 and no_delivery_image_file:
             try:
+                # Ensure directory exists before copying
+                if not os.path.isdir(shipper_path):
+                    os.makedirs(shipper_path, exist_ok=True)
                 copyfile(no_delivery_image_file, shipper_path + image_name)
                 if data is not None:
                     data[image_attr] = image_name
@@ -1605,7 +1500,7 @@ def get_count(
                 _LOGGER.error("Error attempting to copy image: %s", str(err))
 
         # Update coordinator data if new image was saved
-        if new_image_saved and data is not None:
+        if new_image_saved and data is not None and os.path.isdir(shipper_path):
             for file in os.listdir(shipper_path):
                 # Check for common image extensions
                 if file.endswith((".jpg", ".jpeg", ".png", ".gif")):
@@ -1756,129 +1651,7 @@ def find_text(
     _LOGGER.debug("Search for (%s) count results: %s", search_terms, count)
     return count
 
-
-<<<<<<< HEAD
-def _generic_delivery_search(
-    account: Type[imaplib.IMAP4_SSL],
-    image_path: str,
-    hass: HomeAssistant,
-    image_name: str,
-    shipper_name: str,
-    sensor_key: str,
-    image_attr: str,
-    no_delivery_image_file: str,
-    coordinator_data: Optional[dict] = None,
-    forwarded_emails: Optional[dict] = None,
-    image_type: str = "jpeg",
-    cid_name: Optional[str] = None,
-    attachment_filename_pattern: Optional[str] = None,
-) -> int:
-    """Generic function to search for delivery emails and extract photos.
-
-    Args:
-        account: IMAP account
-        image_path: Base path for images
-        hass: Home Assistant instance
-        image_name: Name for the image file
-        shipper_name: Name of the shipper (e.g., "ups", "walmart", "fedex")
-        sensor_key: Key in SENSOR_DATA (e.g., "ups_delivered")
-        image_attr: Attribute name for coordinator data (e.g., ATTR_UPS_IMAGE)
-        no_delivery_image_file: Path to default "no delivery" image
-        coordinator_data: Coordinator data dict to update
-        image_type: Image MIME type ("jpeg" or "png")
-        cid_name: Optional CID name to look for in HTML (e.g., "deliveryPhoto")
-        attachment_filename_pattern: Optional pattern to match in attachment filenames
-
-    Returns:
-        Count of delivery emails found
-    """
-    _LOGGER.debug("Searching for %s delivery emails", shipper_name)
-    _LOGGER.debug("%s image name: %s", shipper_name.capitalize(), image_name)
-
-    today = get_formatted_date()
-    count = 0
-    new_image_saved = False
-    shipper_path = f"{image_path}{shipper_name}/"
-
-    if forwarded_emails:
-        email_addresses = forwarded_emails + SENSOR_DATA[sensor_key][ATTR_EMAIL]
-    else:
-        email_addresses = SENSOR_DATA[sensor_key][ATTR_EMAIL]
-
-    # Search for delivered emails - loop through all subjects
-    emails_found = []
-    for subject in SENSOR_DATA[sensor_key][ATTR_SUBJECT]:
-        _LOGGER.debug("Searching for %s emails with subject: %s", shipper_name, subject)
-        (server_response, data) = email_search(
-            account,
-            email_addresses,
-            today,
-            subject,
-        )
-        if server_response == "OK" and data[0] is not None and data[0] != b"":
-            for email_id in data:
-                if email_id not in emails_found:
-                    emails_found.append(email_id)
-
-    if not emails_found or all(
-        email_id == b"" or email_id is None for email_id in emails_found
-    ):
-        _LOGGER.debug("No %s delivery emails found", shipper_name)
-        if count == 0:
-            try:
-                copyfile(no_delivery_image_file, shipper_path + image_name)
-                if coordinator_data is not None:
-                    coordinator_data[image_attr] = image_name
-            except Exception as err:
-                _LOGGER.error("Error attempting to copy image: %s", str(err))
-        return count
-
-    # Create directory if needed
-    if not os.path.isdir(shipper_path):
-        try:
-            os.makedirs(shipper_path)
-        except Exception as err:
-            _LOGGER.critical("Error creating directory: %s", str(err))
-            return count
-
-    # Clean up image directory
-    cleanup_images(shipper_path)
-
-    # Process all found emails
-    for email_data in emails_found:
-        if email_data and email_data != b"":
-            for num in email_data.split():
-                _LOGGER.debug("Processing %s email number: %s", shipper_name, num)
-                msg = email_fetch(account, num, "(RFC822)")[1]
-                for response_part in msg:
-                    if isinstance(response_part, tuple):
-                        sdata = response_part[1].decode("utf-8", "ignore")
-                        count += 1
-                        if _generic_delivery_image_extraction(
-                            sdata,
-                            image_path,
-                            image_name,
-                            shipper_name,
-                            image_type,
-                            cid_name,
-                            attachment_filename_pattern,
-                        ):
-                            new_image_saved = True
-
-    # Update coordinator data if new image was saved
-    if new_image_saved and coordinator_data is not None:
-        for file in os.listdir(shipper_path):
-            # Check for common image extensions
-            if file.endswith((".jpg", ".jpeg", ".png", ".gif")):
-                coordinator_data[image_attr] = file
-                break
-
-    _LOGGER.debug("%s delivery photos extracted: %s", shipper_name.capitalize(), count)
-    return count
-
-
-=======
->>>>>>> 999a254 (simplify logic)
+# pylint: disable=too-many-return-statements
 def _generic_delivery_image_extraction(
     sdata: Any,
     image_path: str,
@@ -1888,7 +1661,7 @@ def _generic_delivery_image_extraction(
     cid_name: Optional[str] = None,
     attachment_filename_pattern: Optional[str] = None,
 ) -> bool:
-    """Generic function to extract delivery photos from email.
+    """Extract delivery photos from email.
 
     Args:
         sdata: Email content as string

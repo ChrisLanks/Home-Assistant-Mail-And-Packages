@@ -62,6 +62,7 @@ _LOGGER = logging.getLogger(__name__)
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
@@ -120,9 +121,15 @@ _LOGGER = logging.getLogger(__name__)
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email,amazon@example.com,fake@email%$^&@example.com,bogusemail@testamazon.com",
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": True,
                 "custom_img_file": "images/test.gif",
                 "host": "imap.test.email",
@@ -318,9 +325,15 @@ async def test_form(
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": [],
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": True,
                 "custom_img_file": "images/test.gif",
                 "host": "imap.test.email",
@@ -511,9 +524,15 @@ async def test_form_no_fwds(
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": ["fakeuser@test.email", "fakeuser2@test.email"],
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": True,
                 "custom_img_file": "images/test.gif",
                 "host": "imap.test.email",
@@ -729,6 +748,7 @@ async def test_form_connection_error(input_1, step_id_2, hass, mock_imap):
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
             },
             "imap.test.email",
@@ -739,6 +759,7 @@ async def test_form_connection_error(input_1, step_id_2, hass, mock_imap):
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "host": "imap.test.email",
                 "port": 993,
@@ -899,12 +920,22 @@ async def test_form_invalid_ffmpeg(
             "imap.test.email",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+>>>>>>> 1e3a446 (broken tests)
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "amazon_days": 3,
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": [],
@@ -1036,10 +1067,22 @@ async def test_form_index_error(
             "config_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -1088,12 +1131,22 @@ async def test_form_index_error(
             "imap.test.email",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+>>>>>>> 1e3a446 (broken tests)
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "amazon_days": 3,
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": [],
@@ -1273,12 +1326,22 @@ async def test_form_index_error_2(
             "imap.test.email",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+>>>>>>> 1e3a446 (broken tests)
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "amazon_days": 3,
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": [],
@@ -1458,12 +1521,22 @@ async def test_form_mailbox_format2(
             "imap.test.email",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+>>>>>>> 1e3a446 (broken tests)
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "amazon_days": 3,
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": [],
@@ -1629,7 +1702,11 @@ async def test_imap_login_error(mock_imap_login_error, caplog):
     await _test_login(
         "127.0.0.1", 993, "fakeuser@test.email", "suchfakemuchpassword", "SSL", True
     )
-    assert "Error logging into IMAP Server:" in caplog.text
+    assert (
+        "Error logging into IMAP Server:" in caplog.text
+        or "Error connecting into IMAP Server:" in caplog.text
+        or "Network error while connecting to server:" in caplog.text
+    )
 
 
 @pytest.mark.parametrize(
@@ -1647,10 +1724,22 @@ async def test_imap_login_error(mock_imap_login_error, caplog):
             "config_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -1775,10 +1864,22 @@ async def test_form_amazon_error(
             "config_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -1825,6 +1926,7 @@ async def test_form_amazon_error(
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
             },
             "test_form_amazon_error_2",
@@ -1832,6 +1934,7 @@ async def test_form_amazon_error(
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
             },
         ),
@@ -1907,10 +2010,22 @@ async def test_form_amazon_error_2(
             "config_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -2093,6 +2208,7 @@ async def test_form_storage_error(
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
@@ -2155,7 +2271,11 @@ async def test_form_storage_error(
                 "ups_custom_img": False,
                 "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": True,
                 "custom_img_file": "images/test.gif",
                 "host": "imap.test.email",
@@ -2311,6 +2431,7 @@ async def test_reconfigure(
                 "imap_timeout": 120,
                 "scan_interval": 60,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "resources": [
                     "fedex_delivered",
@@ -2356,12 +2477,16 @@ async def test_reconfigure(
                 "amazon_fwds": "fakeuser@fake.email, fakeuser2@fake.email",
                 "amazon_custom_img": False,
                 "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
-                "custom_img": True,
-                "custom_img_file": "images/test.gif",
                 "ups_custom_img": False,
                 "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": True,
+                "custom_img_file": "images/test.gif",
                 "host": "imap.test.email",
                 "port": 993,
                 "username": "test@test.email",
@@ -2496,10 +2621,22 @@ async def test_reconfigure_no_amazon(
             "reconfig_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -2540,9 +2677,7 @@ async def test_reconfigure_no_amazon(
             "reconfig_4",
             {
                 "amazon_custom_img": False,
-                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "ups_custom_img": False,
-                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
             },
             "imap.test.email",
             {
@@ -2556,7 +2691,11 @@ async def test_reconfigure_no_amazon(
                 "ups_custom_img": False,
                 "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": False,
                 "host": "imap.test.email",
                 "port": 993,
@@ -2687,10 +2826,22 @@ async def test_reconfigure_no_amazon_no_custom_image(
             "reconfig_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -2745,11 +2896,15 @@ async def test_reconfigure_no_amazon_no_custom_image(
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
                 "amazon_custom_img": False,
                 "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
-                "custom_img": False,
                 "ups_custom_img": False,
                 "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                "custom_img": False,
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "host": "imap.test.email",
                 "port": 993,
                 "username": "test@test.email",
@@ -3189,10 +3344,22 @@ async def test_reconfigure_with_custom_images(
             "reconfig_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -3245,6 +3412,16 @@ async def test_reconfigure_with_custom_images(
                 "amazon_days": 3,
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+                "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": False,
                 "host": "imap.test.email",
                 "port": 993,
@@ -3391,9 +3568,17 @@ async def test_reconfigure_with_default_images(
             "config_2",
             {
                 "allow_external": False,
-                "custom_img": False,
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -3451,6 +3636,14 @@ async def test_reconfigure_with_default_images(
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
                 "amazon_custom_img": True,
                 "amazon_custom_img_file": "images/amazon_custom.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+                "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "custom_img": False,
                 "host": "imap.test.email",
                 "port": 993,
@@ -3495,10 +3688,6 @@ async def test_reconfigure_with_default_images(
                     "zpackages_delivered",
                     "zpackages_transit",
                 ],
-                "ups_custom_img": False,
-                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
-                "walmart_custom_img": False,
-                "generic_custom_img": False,
                 "verify_ssl": False,
             },
         ),
@@ -3603,9 +3792,17 @@ async def test_config_flow_with_amazon_custom_image_only(
             "config_2",
             {
                 "allow_external": False,
-                "custom_img": False,
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -3662,6 +3859,7 @@ async def test_config_flow_with_amazon_custom_image_only(
                 "amazon_domain": "amazon.com",
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
                 "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
                 "custom_img": False,
                 "host": "imap.test.email",
                 "port": 993,
@@ -3709,7 +3907,11 @@ async def test_config_flow_with_amazon_custom_image_only(
                 "ups_custom_img": True,
                 "ups_custom_img_file": "images/ups_custom.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "verify_ssl": False,
             },
         ),
@@ -3819,6 +4021,7 @@ async def test_config_flow_with_ups_custom_image_only(
                 "amazon_custom_img": True,
                 "ups_custom_img": True,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
@@ -3871,7 +4074,11 @@ async def test_config_flow_with_ups_custom_image_only(
                 "ups_custom_img": True,
                 "ups_custom_img_file": "images/test_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "host": "imap.test.email",
                 "port": 993,
                 "username": "test@test.email",
@@ -4020,6 +4227,7 @@ async def test_reconfigure_with_custom_images(
                 "amazon_custom_img": False,
                 "ups_custom_img": False,
                 "walmart_custom_img": False,
+                "fedex_custom_img": False,
                 "generic_custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
@@ -4061,11 +4269,15 @@ async def test_reconfigure_with_custom_images(
                 "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
                 "amazon_custom_img": False,
                 "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
-                "custom_img": False,
                 "ups_custom_img": False,
                 "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                "custom_img": False,
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
                 "host": "imap.test.email",
                 "port": 993,
                 "username": "test@test.email",
@@ -4306,12 +4518,17 @@ async def test_config_flow_with_amazon_custom_image_only(
             "amazon_domain": "amazon.com",
             "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
             "custom_img": False,
-            "amazon_custom_img": True,
-            "amazon_custom_img_file": "images/test_amazon_only.jpg",
-            "ups_custom_img": False,
-            "walmart_custom_img": False,
-            "generic_custom_img": False,
-            "host": "imap.test.email",
+                "amazon_custom_img": True,
+                "amazon_custom_img_file": "images/test_amazon_only.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+                "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
+                "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "host": "imap.test.email",
             "port": 993,
             "username": "test@test.email",
             "password": "notarealpassword",
@@ -4479,10 +4696,15 @@ async def test_config_flow_with_ups_custom_image_only(
             "amazon_fwds": "fakeuser@test.email,fakeuser2@test.email",
             "custom_img": False,
             "amazon_custom_img": False,
+            "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
             "ups_custom_img": True,
             "ups_custom_img_file": "images/test_ups_only.jpg",
             "walmart_custom_img": False,
+            "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+            "fedex_custom_img": False,
+            "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
             "generic_custom_img": False,
+            "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
             "host": "imap.test.email",
             "port": 993,
             "username": "test@test.email",
@@ -4611,7 +4833,7 @@ async def integration_fixture_v10_migration(hass, caplog):
     await hass.async_block_till_done()
 
     # Verify migration occurred
-    assert "Migration complete to version 12" in caplog.text
+    assert "Migration complete to version 13" in caplog.text
 
     # Verify the new fields were added
     assert CONF_AMAZON_CUSTOM_IMG in entry.data
@@ -4628,7 +4850,7 @@ async def integration_fixture_v10_migration(hass, caplog):
     assert "no_deliveries_walmart.jpg" in entry.data[CONF_WALMART_CUSTOM_IMG_FILE]
 
     # Verify version was updated
-    assert entry.version == 12
+    assert entry.version == 13
 
     yield entry
 
@@ -4685,7 +4907,7 @@ async def test_migration_from_version_10_to_11(hass, caplog):
     await hass.async_block_till_done()
 
     # Verify migration occurred
-    assert "Migration complete to version 12" in caplog.text
+    assert "Migration complete to version 13" in caplog.text
 
     # Verify the new fields were added with correct defaults
     assert CONF_AMAZON_CUSTOM_IMG in entry.data
@@ -4712,7 +4934,7 @@ async def test_migration_from_version_10_to_11(hass, caplog):
     )
 
     # Verify version was updated
-    assert entry.version == 12
+    assert entry.version == 13
 
     # Verify existing fields were preserved
     assert entry.data["amazon_days"] == 3
@@ -4766,7 +4988,7 @@ async def test_migration_from_version_9_to_11(hass, caplog):
     await hass.async_block_till_done()
 
     # Verify migration occurred
-    assert "Migration complete to version 12" in caplog.text
+    assert "Migration complete to version 13" in caplog.text
 
     # Verify all missing fields were added
     assert "storage" in entry.data
@@ -4796,7 +5018,7 @@ async def test_migration_from_version_9_to_11(hass, caplog):
     )
 
     # Verify version was updated
-    assert entry.version == 12
+    assert entry.version == 13
 
 
 async def test_migration_from_version_11_no_changes(hass, caplog):
@@ -4810,9 +5032,9 @@ async def test_migration_from_version_11_no_changes(hass, caplog):
         "custom_img": False,
         "custom_img_file": "custom_components/mail_and_packages/images/mail_none.gif",
         "amazon_custom_img": False,
-        "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
         "ups_custom_img": False,
-        "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+        "walmart_custom_img": False,
+        "fedex_custom_img": False,
         "folder": '"INBOX"',
         "generate_grid": False,
         "generate_mp4": False,
@@ -4850,7 +5072,7 @@ async def test_migration_from_version_11_no_changes(hass, caplog):
     await hass.async_block_till_done()
 
     # Migration should occur from version 11 to 12 to add Walmart and Generic fields
-    assert "Migration complete to version 12" in caplog.text
+    assert "Migration complete to version 13" in caplog.text
 
     # Verify all fields are still present and unchanged
     assert CONF_AMAZON_CUSTOM_IMG in entry.data
@@ -4877,7 +5099,7 @@ async def test_migration_from_version_11_no_changes(hass, caplog):
     )
 
     # Verify version remains 12
-    assert entry.version == 12
+    assert entry.version == 13
 
 
 async def test_migration_preserves_existing_custom_image_settings(hass, caplog):
@@ -4929,7 +5151,7 @@ async def test_migration_preserves_existing_custom_image_settings(hass, caplog):
     await hass.async_block_till_done()
 
     # Verify migration occurred
-    assert "Migration complete to version 12" in caplog.text
+    assert "Migration complete to version 13" in caplog.text
 
     # Verify existing custom image settings were preserved
     assert CONF_AMAZON_CUSTOM_IMG in entry.data
@@ -4949,7 +5171,7 @@ async def test_migration_preserves_existing_custom_image_settings(hass, caplog):
     )  # Default
 
     # Verify version was updated
-    assert entry.version == 12
+    assert entry.version == 13
 
 
 async def test_migration_with_minimal_config(hass, caplog):
@@ -4975,7 +5197,7 @@ async def test_migration_with_minimal_config(hass, caplog):
 
     # Verify migration occurred
     assert any(
-        "Migration complete to version 12" in record.message
+        "Migration complete to version 13" in record.message
         for record in caplog.records
     )
 
@@ -4993,7 +5215,7 @@ async def test_migration_with_minimal_config(hass, caplog):
     assert CONF_WALMART_CUSTOM_IMG_FILE in entry.data
 
     # Verify version was updated
-    assert entry.version == 12
+    assert entry.version == 13
 
 
 @pytest.mark.parametrize(
@@ -5011,10 +5233,22 @@ async def test_migration_with_minimal_config(hass, caplog):
             "reconfig_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -5074,7 +5308,7 @@ async def test_reconfig_amazon_error(
     ):
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"], input_1
-        )
+    )
 
     assert result["type"] == "form"
     assert result["step_id"] == "reconfigure"
@@ -5095,10 +5329,22 @@ async def test_reconfig_amazon_error(
             "reconfig_2",
             {
                 "allow_external": False,
+<<<<<<< HEAD
                 "allow_forwarded_emails": False,
                 "custom_img": False,
+=======
+                "amazon_custom_img": False,
+                "amazon_custom_img_file": "custom_components/mail_and_packages/no_deliveries_amazon.jpg",
+                "ups_custom_img": False,
+                "ups_custom_img_file": "custom_components/mail_and_packages/no_deliveries_ups.jpg",
+>>>>>>> 1e3a446 (broken tests)
                 "walmart_custom_img": False,
+                "walmart_custom_img_file": "custom_components/mail_and_packages/no_deliveries_walmart.jpg",
+                "fedex_custom_img": False,
+                "fedex_custom_img_file": "custom_components/mail_and_packages/no_deliveries_fedex.jpg",
                 "generic_custom_img": False,
+                "generic_custom_img_file": "custom_components/mail_and_packages/no_deliveries_generic.jpg",
+                "custom_img": False,
                 "folder": '"INBOX"',
                 "generate_grid": False,
                 "generate_mp4": False,
@@ -5310,48 +5556,48 @@ async def test_walmart_custom_image_in_config_flow(hass):
             },
         )
 
-    # Should proceed to step 3 for custom image file configuration
-    assert result["type"] == "form"
-    assert result["step_id"] == "config_3"
-
-    # Complete step 3 with Walmart custom image file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
-        temp_file_path = temp_file.name
-        temp_file.write(b"fake walmart image data")
-
-    try:
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {
-                CONF_WALMART_CUSTOM_IMG_FILE: temp_file_path,
-            },
-        )
-
-        # Should proceed to storage step
+        # Should proceed to step 3 for custom image file configuration
         assert result["type"] == "form"
-        assert result["step_id"] == "config_storage"
+        assert result["step_id"] == "config_3"
 
-        # Complete storage step
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {
-                "storage": "custom_components/mail_and_packages/images/",
-            },
-        )
+        # Complete step 3 with Walmart custom image file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+            temp_file_path = temp_file.name
+            temp_file.write(b"fake walmart image data")
 
-        # Should create entry successfully
-        assert result["type"] == "create_entry"
-        assert result["title"] == "imap.test.email"
+        try:
+            result = await hass.config_entries.flow.async_configure(
+                result["flow_id"],
+                {
+                    CONF_WALMART_CUSTOM_IMG_FILE: temp_file_path,
+                },
+            )
 
-        # Verify Walmart custom image settings are saved
-        entry = result["result"]
-        assert entry.data[CONF_WALMART_CUSTOM_IMG] is True
-        assert entry.data[CONF_WALMART_CUSTOM_IMG_FILE] == temp_file_path
+            # Should proceed to storage step
+            assert result["type"] == "form"
+            assert result["step_id"] == "config_storage"
 
-    finally:
-        # Clean up temp file
-        if os.path.exists(temp_file_path):
-            os.unlink(temp_file_path)
+            # Complete storage step
+            result = await hass.config_entries.flow.async_configure(
+                result["flow_id"],
+                {
+                    "storage": "custom_components/mail_and_packages/images/",
+                },
+            )
+
+            # Should create entry successfully
+            assert result["type"] == "create_entry"
+            assert result["title"] == "imap.test.email"
+
+            # Verify Walmart custom image settings are saved
+            entry = result["result"]
+            assert entry.data[CONF_WALMART_CUSTOM_IMG] is True
+            assert entry.data[CONF_WALMART_CUSTOM_IMG_FILE] == temp_file_path
+
+        finally:
+            # Clean up temp file
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
 
 
 async def test_generic_custom_image_validation(hass: HomeAssistant):
@@ -5372,6 +5618,7 @@ async def test_generic_custom_image_validation(hass: HomeAssistant):
         "amazon_custom_img": False,
         "ups_custom_img": False,
         "walmart_custom_img": False,
+        "fedex_custom_img": False,
         "generic_custom_img": True,
         "generic_custom_img_file": "/nonexistent/path/image.jpg",
         "folder": '"INBOX"',
@@ -5463,50 +5710,51 @@ async def test_generic_custom_image_in_config_flow(hass: HomeAssistant):
             assert result["type"] == FlowResultType.FORM
             assert result["step_id"] == "config_2"
 
-            # Step 2: Enable generic custom image
-            result = await hass.config_entries.flow.async_configure(
-                result["flow_id"],
-                {
-                    "allow_external": False,
-                    "custom_img": False,
-                    "amazon_custom_img": False,
-                    "ups_custom_img": False,
-                    "walmart_custom_img": False,
-                    "generic_custom_img": True,
-                    "folder": '"INBOX"',
-                    "generate_grid": False,
-                    "generate_mp4": False,
-                    "resources": ["usps_mail"],
-                },
-            )
-            assert result["type"] == FlowResultType.FORM
-            assert result["step_id"] == "config_3"
+        # Step 2: Enable generic custom image
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {
+                "allow_external": False,
+                "custom_img": False,
+                "amazon_custom_img": False,
+                "ups_custom_img": False,
+                "walmart_custom_img": False,
+                "fedex_custom_img": False,
+                "generic_custom_img": True,
+                "folder": '"INBOX"',
+                "generate_grid": False,
+                "generate_mp4": False,
+                "resources": ["usps_mail"],
+            },
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "config_3"
 
-            # Step 3: Set generic custom image file
-            result = await hass.config_entries.flow.async_configure(
-                result["flow_id"],
-                {
-                    "generic_custom_img_file": temp_file_path,
-                },
-            )
-            assert result["type"] == FlowResultType.FORM
-            assert result["step_id"] == "config_storage"
+        # Step 3: Set generic custom image file
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {
+                "generic_custom_img_file": temp_file_path,
+            },
+        )
+        assert result["type"] == FlowResultType.FORM
+        assert result["step_id"] == "config_storage"
 
-            # Step 4: Storage settings
-            result = await hass.config_entries.flow.async_configure(
-                result["flow_id"],
-                {
-                    "storage": "custom_components/mail_and_packages/images/",
-                },
-            )
-            assert result["type"] == FlowResultType.CREATE_ENTRY
-            assert result["title"] == "imap.test.email"
+        # Step 4: Storage settings
+        result = await hass.config_entries.flow.async_configure(
+            result["flow_id"],
+            {
+                "storage": "custom_components/mail_and_packages/images/",
+            },
+        )
+        assert result["type"] == FlowResultType.CREATE_ENTRY
+        assert result["title"] == "imap.test.email"
 
-            # Verify generic custom image settings are saved
-            entry = result["result"]
-            assert entry.data[CONF_GENERIC_CUSTOM_IMG] is True
-            assert entry.data[CONF_GENERIC_CUSTOM_IMG_FILE] == temp_file_path
-            assert entry.version == 12
+        # Verify generic custom image settings are saved
+        entry = result["result"]
+        assert entry.data[CONF_GENERIC_CUSTOM_IMG] is True
+        assert entry.data[CONF_GENERIC_CUSTOM_IMG_FILE] == temp_file_path
+        assert entry.version == 13
 
     finally:
         # Clean up temp file
@@ -5514,8 +5762,8 @@ async def test_generic_custom_image_in_config_flow(hass: HomeAssistant):
             os.unlink(temp_file_path)
 
 
-async def test_migration_to_version_12(hass: HomeAssistant):
-    """Test migration to version 12 adds new generic camera fields."""
+async def test_migration_to_version_13(hass: HomeAssistant):
+    """Test migration to version 13 adds new generic camera fields."""
     # Create a mock config entry with version 11
     entry = MockConfigEntry(
         domain=DOMAIN,
@@ -5532,6 +5780,7 @@ async def test_migration_to_version_12(hass: HomeAssistant):
             "amazon_custom_img": False,
             "ups_custom_img": False,
             "walmart_custom_img": False,
+            "fedex_custom_img": False,
             "folder": '"INBOX"',
             "generate_grid": False,
             "generate_mp4": False,
@@ -5551,7 +5800,7 @@ async def test_migration_to_version_12(hass: HomeAssistant):
         await hass.async_block_till_done()
 
     # Verify version was updated to 12
-    assert entry.version == 12
+    assert entry.version == 13
 
     # Verify new generic camera fields were added with defaults
     assert CONF_GENERIC_CUSTOM_IMG in entry.data
@@ -5586,6 +5835,7 @@ async def test_migration_to_version_13(hass: HomeAssistant):
             "amazon_custom_img": False,
             "ups_custom_img": False,
             "walmart_custom_img": False,
+                "fedex_custom_img": False,
             "generic_custom_img": False,
             "folder": '"INBOX"',
             "generate_grid": False,

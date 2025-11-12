@@ -603,7 +603,8 @@ async def test_camera_entity_creation(
         "camera.mail_usps_camera",
         "camera.mail_amazon_delivery_camera",
         "camera.mail_ups_camera",
-        "camera.mail_walmart_camera",
+        "camera.mail_walmart_delivery_camera",
+        "camera.mail_fedex_delivery_camera",
         "camera.mail_generic_delivery_camera",
     ]
 
@@ -635,7 +636,8 @@ async def test_camera_image_update_service(
         "camera.mail_usps_camera",
         "camera.mail_amazon_delivery_camera",
         "camera.mail_ups_camera",
-        "camera.mail_walmart_camera",
+        "camera.mail_walmart_delivery_camera",
+        "camera.mail_fedex_delivery_camera",
         "camera.mail_generic_delivery_camera",
     ]
 
@@ -1393,14 +1395,14 @@ async def test_walmart_camera(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_walmart_camera")
-        assert state.attributes.get("friendly_name") == "Mail Walmart Camera"
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
+        assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
         assert (
             "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
             in state.attributes.get("file_path")
         )
 
-        service_data = {"entity_id": "camera.mail_walmart_camera"}
+        service_data = {"entity_id": "camera.mail_walmart_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
 
@@ -1429,11 +1431,11 @@ async def test_walmart_camera(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_walmart_camera")
-        assert state.attributes.get("friendly_name") == "Mail Walmart Camera"
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
+        assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
         assert "images/test_walmart.jpg" in state.attributes.get("file_path")
 
-        service_data = {"entity_id": "camera.mail_walmart_camera"}
+        service_data = {"entity_id": "camera.mail_walmart_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
         assert "images/test_walmart.jpg" in state.attributes.get("file_path")
@@ -1467,8 +1469,8 @@ async def test_walmart_camera_with_image_data(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_walmart_camera")
-        assert state.attributes.get("friendly_name") == "Mail Walmart Camera"
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
+        assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
 
         # Update the camera to use the new data
         cameras = hass.data[DOMAIN][entry.entry_id][CAMERA]
@@ -1482,7 +1484,7 @@ async def test_walmart_camera_with_image_data(
         await hass.async_block_till_done()
 
         # Get the updated state after the file path update
-        state = hass.states.get("camera.mail_walmart_camera")
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
 
         # Check that it's using the Walmart image path
         assert "test_walmart_image.jpg" in state.attributes.get("file_path")
@@ -1524,11 +1526,11 @@ async def test_walmart_camera_with_custom_image(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_walmart_camera")
-        assert state.attributes.get("friendly_name") == "Mail Walmart Camera"
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
+        assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
         assert "images/test_walmart.jpg" in state.attributes.get("file_path")
 
-        service_data = {"entity_id": "camera.mail_walmart_camera"}
+        service_data = {"entity_id": "camera.mail_walmart_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
         assert "images/test_walmart.jpg" in state.attributes.get("file_path")
@@ -1555,15 +1557,15 @@ async def test_walmart_camera_default_image_path(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_walmart_camera")
-        assert state.attributes.get("friendly_name") == "Mail Walmart Camera"
+        state = hass.states.get("camera.mail_walmart_delivery_camera")
+        assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
         # Should use the new Walmart-specific default image
         assert (
             "custom_components/mail_and_packages/no_deliveries_walmart.jpg"
             in state.attributes.get("file_path")
         )
 
-        service_data = {"entity_id": "camera.mail_walmart_camera"}
+        service_data = {"entity_id": "camera.mail_walmart_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
 
@@ -1595,14 +1597,14 @@ async def test_fedex_camera(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
         assert (
             "custom_components/mail_and_packages/no_deliveries_fedex.jpg"
             in state.attributes.get("file_path")
         )
 
-        service_data = {"entity_id": "camera.mail_fedex_camera"}
+        service_data = {"entity_id": "camera.mail_fedex_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
 
@@ -1631,11 +1633,11 @@ async def test_fedex_camera(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
         assert "images/test_fedex.jpg" in state.attributes.get("file_path")
 
-        service_data = {"entity_id": "camera.mail_fedex_camera"}
+        service_data = {"entity_id": "camera.mail_fedex_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
         assert "images/test_fedex.jpg" in state.attributes.get("file_path")
@@ -1669,7 +1671,7 @@ async def test_fedex_camera_with_image_data(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
 
         # Update the camera to use the new data
@@ -1684,7 +1686,7 @@ async def test_fedex_camera_with_image_data(
         await hass.async_block_till_done()
 
         # Get the updated state after the file path update
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
 
         # Check that it's using the FedEx image path
         assert "test_fedex_image.jpg" in state.attributes.get("file_path")
@@ -1726,11 +1728,11 @@ async def test_fedex_camera_with_custom_image(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
         assert "images/test_fedex.jpg" in state.attributes.get("file_path")
 
-        service_data = {"entity_id": "camera.mail_fedex_camera"}
+        service_data = {"entity_id": "camera.mail_fedex_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
         assert "images/test_fedex.jpg" in state.attributes.get("file_path")
@@ -1757,7 +1759,7 @@ async def test_fedex_camera_default_image_path(
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
     ):
-        state = hass.states.get("camera.mail_fedex_camera")
+        state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
         # Should use the new FedEx-specific default image
         assert (
@@ -1765,7 +1767,7 @@ async def test_fedex_camera_default_image_path(
             in state.attributes.get("file_path")
         )
 
-        service_data = {"entity_id": "camera.mail_fedex_camera"}
+        service_data = {"entity_id": "camera.mail_fedex_delivery_camera"}
         await hass.services.async_call(DOMAIN, "update_image", service_data)
         await hass.async_block_till_done()
 
