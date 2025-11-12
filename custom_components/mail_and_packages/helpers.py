@@ -777,7 +777,7 @@ def get_today() -> datetime.date:
     """
     # For testing, set the date you wish here
     return datetime.date.today()
-    #return datetime.date.today() - datetime.timedelta(days=1)
+    # return datetime.date.today() - datetime.timedelta(days=1)
 
 
 def get_formatted_date() -> str:
@@ -1524,9 +1524,7 @@ def get_count(
                                 shipper_name,
                                 extraction_result,
                             )
-                            expected_file_path = (
-                                f"{absolute_shipper_path}{image_name}"
-                            )
+                            expected_file_path = f"{absolute_shipper_path}{image_name}"
 
                             # If we get a result and the file exists, then we can save the image
                             if extraction_result and os.path.exists(expected_file_path):
@@ -1561,17 +1559,12 @@ def get_count(
                                     )
                                     # Log all image-related keys in coordinator
                                     image_keys = [
-                                        k
-                                        for k in data.keys()
-                                        if "image" in k.lower()
+                                        k for k in data.keys() if "image" in k.lower()
                                     ]
                                     _LOGGER.info(
                                         "%s - All image keys in coordinator: %s",
                                         shipper_name,
-                                        {
-                                            k: data.get(k, "NOT SET")
-                                            for k in image_keys
-                                        },
+                                        {k: data.get(k, "NOT SET") for k in image_keys},
                                     )
                                 else:
                                     _LOGGER.warning(
