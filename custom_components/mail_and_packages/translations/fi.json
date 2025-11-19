@@ -42,6 +42,7 @@
           "amazon_custom_img": "Käytä mukautettua Amazon 'ei toimituksia' kuvaa?",
           "ups_custom_img": "Käytä mukautettua UPS 'ei toimituksia' kuvaa?",
           "walmart_custom_img": "Käytä mukautettua Walmart 'ei toimituksia' kuvaa?",
+          "fedex_custom_img": "Käytä mukautettua FedEx 'ei toimituksia' kuvaa?",
           "generic_custom_img": "Käytä mukautettua yleistä 'ei toimituksia' kuvaa?",
           "generate_grid": "Luo kuvaverkko LLM-näkömalleille",
           "allow_forwarded_emails": "Salli edelleenlähetetyt sähköpostit palvelun oletusarvojen lisäksi (esim. no-reply@usps.com)"
@@ -92,6 +93,7 @@
           "amazon_custom_img": "Käytä mukautettua Amazon 'ei toimituksia' kuvaa?",
           "ups_custom_img": "Käytä mukautettua UPS 'ei toimituksia' kuvaa?",
           "walmart_custom_img": "Käytä mukautettua Walmart 'ei toimituksia' kuvaa?",
+          "fedex_custom_img": "Käytä mukautettua FedEx 'ei toimituksia' kuvaa?",
           "generic_custom_img": "Käytä mukautettua yleistä 'ei toimituksia' kuvaa?",
           "generate_grid": "Luo kuvaverkko LLM-näkömalleille",
           "allow_forwarded_emails": "Salli edelleenlähetetyt sähköpostit palvelun oletusarvojen lisäksi (esim. no-reply@usps.com)"

@@ -20,6 +20,7 @@ from .const import (
     ATTR_IMAGE_PATH,
     ATTR_UPS_IMAGE,
     ATTR_WALMART_IMAGE,
+    ATTR_FEDEX_IMAGE,
     CAMERA,
     CAMERA_DATA,
     CONF_CUSTOM_IMG,
@@ -30,6 +31,8 @@ from .const import (
     CONF_UPS_CUSTOM_IMG_FILE,
     CONF_WALMART_CUSTOM_IMG,
     CONF_WALMART_CUSTOM_IMG_FILE,
+    CONF_FEDEX_CUSTOM_IMG,
+    CONF_FEDEX_CUSTOM_IMG_FILE,
     CONF_GENERIC_CUSTOM_IMG,
     CONF_GENERIC_CUSTOM_IMG_FILE,
     COORDINATOR,
@@ -128,6 +131,10 @@ class MailCam(CoordinatorEntity, Camera):
                 _LOGGER.debug(
                     "Walmart camera - custom image enabled: %s", self._no_mail
                 )
+        elif self._type == "fedex_camera":
+            if config.data.get(CONF_FEDEX_CUSTOM_IMG):
+                self._no_mail = config.data.get(CONF_FEDEX_CUSTOM_IMG_FILE)
+                _LOGGER.debug("FedEx camera - custom image enabled: %s", self._no_mail)
         elif self._type == "generic_camera":
             if config.data.get(CONF_GENERIC_CUSTOM_IMG):
                 self._no_mail = config.data.get(CONF_GENERIC_CUSTOM_IMG_FILE)
@@ -169,6 +176,14 @@ class MailCam(CoordinatorEntity, Camera):
                 self._file_path = (
                     f"{os.path.dirname(__file__)}/no_deliveries_walmart.jpg"
                 )
+        elif self._type == "fedex_camera":
+            if config.data.get(CONF_FEDEX_CUSTOM_IMG):
+                self._file_path = config.data.get(CONF_FEDEX_CUSTOM_IMG_FILE)
+                _LOGGER.debug(
+                    "FedEx camera - initial file path set to: %s", self._file_path
+                )
+            else:
+                self._file_path = f"{os.path.dirname(__file__)}/no_deliveries_fedex.jpg"
         elif self._type == "generic_camera":
             if config.data.get(CONF_GENERIC_CUSTOM_IMG):
                 self._file_path = config.data.get(CONF_GENERIC_CUSTOM_IMG_FILE)
@@ -204,7 +219,7 @@ class MailCam(CoordinatorEntity, Camera):
                 "Could not read camera %s image from file: %s", self._name, file_path
             )
 
-    async def update_file_path(self) -> None:
+    async def update_file_path(self) -> None:  # pylint: disable=too-many-nested-blocks
         """Update the file_path."""
         _LOGGER.debug("Camera Update: %s", self._type)
         _LOGGER.debug("Custom No Mail: %s", self._no_mail)
@@ -282,13 +297,33 @@ class MailCam(CoordinatorEntity, Camera):
             else:
                 # Use coordinator data (actual deliveries or generated "no delivery" images)
                 s1 = set([ATTR_WALMART_IMAGE, ATTR_IMAGE_PATH])
-                _LOGGER.debug("Walmart camera - checking for keys: %s", s1)
                 if s1.issubset(self.coordinator.data.keys()):
                     image = self.coordinator.data[ATTR_WALMART_IMAGE]
                     path = f"{self.coordinator.data[ATTR_IMAGE_PATH]}walmart/"
                     file_path = f"{self.hass.config.path()}/{path}{image}"
                     _LOGGER.debug(
                         "Walmart camera - using coordinator data: %s", file_path
+                    )
+
+        elif self._type == "fedex_camera":
+            # Update camera image for FedEx deliveries
+            file_path = f"{os.path.dirname(__file__)}/no_deliveries_fedex.jpg"
+
+            # Check if custom image is configured
+            if self._no_mail:
+                # Use custom image (takes priority over everything)
+                file_path = self._no_mail
+                _LOGGER.debug("FedEx camera - using custom no mail: %s", file_path)
+            else:
+                # Use coordinator data (actual deliveries or generated "no delivery" images)
+                s1 = set([ATTR_FEDEX_IMAGE, ATTR_IMAGE_PATH])
+                _LOGGER.debug("FedEx camera - checking for keys: %s", s1)
+                if s1.issubset(self.coordinator.data.keys()):
+                    image = self.coordinator.data[ATTR_FEDEX_IMAGE]
+                    path = f"{self.coordinator.data[ATTR_IMAGE_PATH]}fedex/"
+                    file_path = f"{self.hass.config.path()}/{path}{image}"
+                    _LOGGER.debug(
+                        "FedEx camera - using coordinator data: %s", file_path
                     )
 
         elif self._type == "generic_camera":

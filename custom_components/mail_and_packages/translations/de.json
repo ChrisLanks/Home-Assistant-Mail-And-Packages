@@ -42,6 +42,7 @@
           "amazon_custom_img": "Benutzerdefiniertes Amazon 'keine Lieferung' Bild verwenden?",
           "ups_custom_img": "Benutzerdefiniertes UPS 'keine Lieferung' Bild verwenden?",
           "walmart_custom_img": "Benutzerdefiniertes Walmart 'keine Lieferung' Bild verwenden?",
+          "fedex_custom_img": "Benutzerdefiniertes FedEx 'keine Lieferung' Bild verwenden?",
           "generic_custom_img": "Benutzerdefiniertes generisches 'keine Lieferung' Bild verwenden?",
           "generate_grid": "Erstellen Sie ein Bildraster für LLM-Vision-Modelle",
           "allow_forwarded_emails": "Weitergeleitete E-Mails zusätzlich zum Standard eines Dienstes zulassen (z. B. no-reply@usps.com)"
@@ -92,6 +93,7 @@
           "amazon_custom_img": "Benutzerdefiniertes Amazon 'keine Lieferung' Bild verwenden?",
           "ups_custom_img": "Benutzerdefiniertes UPS 'keine Lieferung' Bild verwenden?",
           "walmart_custom_img": "Benutzerdefiniertes Walmart 'keine Lieferung' Bild verwenden?",
+          "fedex_custom_img": "Benutzerdefiniertes FedEx 'keine Lieferung' Bild verwenden?",
           "generic_custom_img": "Benutzerdefiniertes generisches 'keine Lieferung' Bild verwenden?",
           "generate_grid": "Erstellen Sie ein Bildraster für LLM-Vision-Modelle",
           "allow_forwarded_emails": "Weitergeleitete E-Mails zusätzlich zum Standard eines Dienstes zulassen (z. B. no-reply@usps.com)"

@@ -42,6 +42,7 @@
           "amazon_custom_img": "¿Usar imagen personalizada de Amazon 'sin entrega'?",
           "ups_custom_img": "¿Usar imagen personalizada de UPS 'sin entrega'?",
           "walmart_custom_img": "¿Usar imagen personalizada de Walmart 'sin entrega'?",
+          "fedex_custom_img": "¿Usar imagen personalizada de FedEx 'sin entrega'?",
           "generic_custom_img": "¿Usar imagen personalizada genérica 'sin entrega'?",
           "generate_grid": "Crear cuadrícula de imágenes para modelos de visión LLM",
           "allow_forwarded_emails": "Permitir correos electrónicos reenviados además de los predeterminados de un servicio (por ejemplo, no-reply@usps.com)"
@@ -92,6 +93,7 @@
           "amazon_custom_img": "¿Usar imagen personalizada de Amazon 'sin entrega'?",
           "ups_custom_img": "¿Usar imagen personalizada de UPS 'sin entrega'?",
           "walmart_custom_img": "¿Usar imagen personalizada de Walmart 'sin entrega'?",
+          "fedex_custom_img": "¿Usar imagen personalizada de FedEx 'sin entrega'?",
           "generic_custom_img": "¿Usar imagen personalizada genérica 'sin entrega'?",
           "generate_grid": "Crear cuadrícula de imágenes para modelos de visión LLM",
           "allow_forwarded_emails": "Permitir correos electrónicos reenviados además de los predeterminados de un servicio (por ejemplo, no-reply@usps.com)"
