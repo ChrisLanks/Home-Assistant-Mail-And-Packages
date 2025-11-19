@@ -39,8 +39,24 @@ pytestmark = pytest.mark.asyncio
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations):
+def auto_enable_custom_integrations(request):
     """Enable custom integration tests."""
+    # Only enable if the test actually uses the hass fixture
+    try:
+        if "hass" in request.fixturenames:
+            # Get the hass fixture value
+            hass = request.getfixturevalue("hass")
+            # Only proceed if hass is actually a HomeAssistant instance, not an async_generator
+            from homeassistant.core import HomeAssistant
+
+            if isinstance(hass, HomeAssistant):
+                from homeassistant import loader
+
+                # Enable custom integrations
+                hass.data.pop(loader.DATA_CUSTOM_COMPONENTS, None)
+    except (AttributeError, TypeError, KeyError):
+        # Skip for tests that don't need hass or if hass is not available
+        pass
     yield
 
 

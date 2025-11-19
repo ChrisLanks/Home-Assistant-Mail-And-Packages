@@ -161,7 +161,7 @@ class MailCam(CoordinatorEntity, Camera):
                 "Could not read camera %s image from file: %s", self._name, file_path
             )
 
-    async def update_file_path(self) -> None:
+    async def update_file_path(self) -> None:  # pylint: disable=too-many-nested-blocks
         """Update the file_path."""
         _LOGGER.debug("Camera Update: %s", self._type)
         _LOGGER.debug("Custom No Mail: %s", self._no_mail)
@@ -391,7 +391,8 @@ class MailCam(CoordinatorEntity, Camera):
                             )
                         else:
                             _LOGGER.warning(
-                                "%s camera - coordinator file not found or not readable: %s (exists: %s, readable: %s)",
+                                "%s camera - coordinator file not found or "
+                                "not readable: %s (exists: %s, readable: %s)",
                                 self._type,
                                 coordinator_file_path,
                                 os.path.exists(coordinator_file_path),
@@ -427,8 +428,10 @@ class MailCam(CoordinatorEntity, Camera):
                                             else False
                                         ),
                                     )
-                                    # Try to find any image file in the directory if the expected one isn't there
-                                    # Prefer the most recent file (by modification time) to show latest delivery
+                                    # Try to find any image file in the directory
+                                    # if the expected one isn't there
+                                    # Prefer the most recent file (by modification
+                                    # time) to show latest delivery
                                     image_files = []
                                     for file in files_in_dir:
                                         if file.endswith(
@@ -457,7 +460,8 @@ class MailCam(CoordinatorEntity, Camera):
                                         )
                                         file_path = image_files[0][0]
                                         _LOGGER.debug(
-                                            "%s camera - found alternative image file (most recent): %s",
+                                            "%s camera - found alternative "
+                                            "image file (most recent): %s",
                                             self._type,
                                             file_path,
                                         )

@@ -341,7 +341,7 @@ async def test_ups_camera_with_image_data(
 
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
-    ):
+    ), patch("os.path.exists", return_value=True):
         state = hass.states.get("camera.mail_ups_camera")
         assert state.attributes.get("friendly_name") == "Mail UPS Camera"
 
@@ -389,7 +389,7 @@ async def test_amazon_camera_with_image_data(
 
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
-    ):
+    ), patch("os.path.exists", return_value=True):
         state = hass.states.get("camera.mail_amazon_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail Amazon Delivery Camera"
 
@@ -1468,7 +1468,7 @@ async def test_walmart_camera_with_image_data(
 
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
-    ):
+    ), patch("os.path.exists", return_value=True):
         state = hass.states.get("camera.mail_walmart_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail Walmart Delivery Camera"
 
@@ -1670,7 +1670,7 @@ async def test_fedex_camera_with_image_data(
 
     with patch("os.path.isfile", return_value=True), patch(
         "os.access", return_value=True
-    ):
+    ), patch("os.path.exists", return_value=True):
         state = hass.states.get("camera.mail_fedex_delivery_camera")
         assert state.attributes.get("friendly_name") == "Mail FedEx Delivery Camera"
 
