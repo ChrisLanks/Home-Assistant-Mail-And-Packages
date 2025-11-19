@@ -313,7 +313,6 @@ class MailDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _binary_sensor_update(self):
         """Update binary sensor states."""
-        # USPS uses different attributes (ATTR_IMAGE_NAME instead of ATTR_*_IMAGE)
         attributes = (ATTR_IMAGE_NAME, ATTR_IMAGE_PATH)
         if set(attributes).issubset(self._data.keys()):
             image = self._data[ATTR_IMAGE_NAME]

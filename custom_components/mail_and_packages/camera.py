@@ -107,6 +107,7 @@ class MailCam(CoordinatorEntity, Camera):
         Camera.__init__(self)
 
         self.hass = hass
+        self.config = config
         self._name = CAMERA_DATA[name][SENSOR_NAME]
         self._type = name
         self._host = config.data.get(CONF_HOST)
