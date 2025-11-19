@@ -1793,6 +1793,7 @@ def find_text(
     _LOGGER.debug("Search for (%s) count results: %s", search_terms, count)
     return count
 
+
 # pylint: disable=too-many-return-statements
 def _generic_delivery_image_extraction(
     sdata: Any,

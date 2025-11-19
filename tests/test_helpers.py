@@ -180,6 +180,7 @@ async def test_process_emails_external(
     assert "/testing_config/custom_components/mail_and_packages/images/" in state.state
     state = hass.states.get(MAIL_IMAGE_URL_ENTITY)
     assert state.state == "unknown"
+
     # Mock os.listdir to return different files based on the path
     def listdir_side_effect(path):
         if "amazon" in path:
@@ -526,7 +527,12 @@ async def test_informed_delivery_forwarded_emails(
     m_open = mock_open()
     with patch("builtins.open", m_open, create=True):
         result = get_mails(
-            mock_imap_informed_delivery_forwarded_email, "./", "5", "mail_today.gif", False, forwarded_emails=["forwarduser@fake.email"]
+            mock_imap_informed_delivery_forwarded_email,
+            "./",
+            "5",
+            "mail_today.gif",
+            False,
+            forwarded_emails=["forwarduser@fake.email"],
         )
         assert result == 3
         assert "USPSInformedDelivery@usps.gov" in caplog.text

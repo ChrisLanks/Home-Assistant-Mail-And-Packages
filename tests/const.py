@@ -1152,4 +1152,3 @@ FAKE_CONFIG_DATA_FORWARDED_EMAILS_NO_AMAZON = {
     "username": "user@fake.email",
     "verify_ssl": False,
 }
-

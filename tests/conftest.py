@@ -2110,6 +2110,7 @@ def mock_imap_walmart_delivering():
 
         yield mock_conn
 
+
 @pytest.fixture()
 def mock_imap_informed_delivery_forwarded_email():
     """Mock imap class values."""
